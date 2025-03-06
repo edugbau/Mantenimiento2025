@@ -1,8 +1,5 @@
 package clubDeportivo;
 
-import clubDeportivo.ClubDeportivo;
-import clubDeportivo.ClubException;
-import clubDeportivo.Grupo;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -134,6 +131,20 @@ public class clubDeportivoTest {
         club.matricular(actividad,2);
 
         assertEquals(plazasAntes - 2, grupo.plazasLibres());
+    }
+
+    @Test
+    @DisplayName("Matricular en un segundo grupo")
+    void matricularSegundoGrupo() throws ClubException{
+        Integer matriculados = 10;
+        Integer tarifa = 50;
+        String[] datos = { "Fortniteor", "pubg", "20", matriculados.toString(), tarifa.toString() };
+        club.anyadirActividad(grupo);
+        club.anyadirActividad(datos);
+
+        club.matricular("pubg",5);
+
+        assertEquals(club.plazasLibres("pubg"), 5);
     }
     // Este test falla ya que no se comprueba si el numero de personas
     // es negativo y se debería hacer
