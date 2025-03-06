@@ -23,8 +23,8 @@ public class ClubDeportivoAltoRendimiento extends ClubDeportivo{
 		this.incremento=incremento;
 	}
 	
-	// El club de alto rendimiento tiene limitadas las plazas. Si el número de plazas que se recibe como parametro es mayor que el permitido, 
-	// se establece su valor al maximo permitido por grupo para el club.
+	// El test.club de alto rendimiento tiene limitadas las plazas. Si el número de plazas que se recibe como parametro es mayor que el permitido,
+	// se establece su valor al maximo permitido por grupo para el test.club.
 	public void anyadirActividad(String[] datos) throws ClubException {
 		if (datos.length<5) {
 			throw new ClubException ("ERROR: faltan datos");
@@ -43,7 +43,7 @@ public class ClubDeportivoAltoRendimiento extends ClubDeportivo{
 		}
 	}
 	
-	// Los ingresos del club tienen
+	// Los ingresos del test.club tienen
 	public double ingresos() {
 		double cantidad = super.ingresos();
 		return cantidad+cantidad*(incremento/100);

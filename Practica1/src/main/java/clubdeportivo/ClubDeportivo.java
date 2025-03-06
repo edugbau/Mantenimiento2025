@@ -14,7 +14,7 @@ public class ClubDeportivo {
 
 	public ClubDeportivo(String nombre, int n) throws ClubException {
 		if (n <= 0) {
-			throw new ClubException("ERROR: el club no puede crearse con un número de grupos 0 o negativo");
+			throw new ClubException("ERROR: el test.club no puede crearse con un número de grupos 0 o negativo");
 		}
 		this.nombre = nombre;
 		grupos = new Grupo[n];
@@ -71,7 +71,7 @@ public class ClubDeportivo {
 	public void matricular(String actividad, int npersonas) throws ClubException {
 		int plazas = plazasLibres(actividad);
 		if (plazas < npersonas) {
-			throw new ClubException("ERROR: no hay suficientes plazas libres para esa actividad en el club.");
+			throw new ClubException("ERROR: no hay suficientes plazas libres para esa actividad en el test.club.");
 		}
 		int i = 0;
 		while (i < ngrupos && npersonas > 0) {
