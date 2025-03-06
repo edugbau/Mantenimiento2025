@@ -1,8 +1,8 @@
 package clubDeportivo;
 
-import clubdeportivo.ClubDeportivo;
-import clubdeportivo.ClubException;
-import clubdeportivo.Grupo;
+import clubDeportivo.ClubDeportivo;
+import clubDeportivo.ClubException;
+import clubDeportivo.Grupo;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
