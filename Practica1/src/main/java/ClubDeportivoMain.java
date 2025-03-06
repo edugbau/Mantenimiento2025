@@ -1,6 +1,6 @@
-import clubdeportivo.ClubDeportivo;
-import clubdeportivo.ClubException;
-import clubdeportivo.Grupo;
+import clubDeportivo.ClubDeportivo;
+import clubDeportivo.ClubException;
+import clubDeportivo.Grupo;
 
 public class ClubDeportivoMain {
 	public static void main(String[] args) {

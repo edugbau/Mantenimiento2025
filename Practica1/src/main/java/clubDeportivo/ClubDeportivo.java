@@ -1,4 +1,4 @@
-package clubdeportivo;
+package clubDeportivo;
 
 import java.util.StringJoiner;
 

@@ -1,4 +1,4 @@
-package clubdeportivo;
+package clubDeportivo;
 
 public class Grupo {
 	private String codigo;
