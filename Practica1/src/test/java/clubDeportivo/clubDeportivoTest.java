@@ -38,10 +38,9 @@ public class clubDeportivoTest {
     @DisplayName("Creación de grupo válida con solo nombre")
     void crearGrupoValidoNombre() throws ClubException {assertNotNull(new ClubDeportivo("Mayans"));}
 
-
     @Test
     @DisplayName("Añadir grupo nulo")
-    void anyadirGrupoNulo() throws ClubException{
+    void anyadirGrupoNulo() throws ClubException {
         assertThrows(ClubException.class, () -> club.anyadirActividad((Grupo) null));
     }
 
@@ -56,7 +55,17 @@ public class clubDeportivoTest {
         club.anyadirActividad(grupo);
         assertDoesNotThrow(() -> club.anyadirActividad(grupo));
     }
+    // Este test solo existe para cubrir los casos de buscar
+    @Test
+    @DisplayName("Añadir dos grupos")
+    void anyadirDosGrupos() throws ClubException{
+        Integer matriculados = 10;
+        Integer tarifa = 50;
+        String[] datos = { "Fortniteor", "pubg", "20", matriculados.toString(), tarifa.toString() };
+        club.anyadirActividad(grupo);
 
+        assertDoesNotThrow(() -> club.anyadirActividad(datos));
+    }
     @Test
     @DisplayName("Añadir grupo mediante datos")
     void anyadirGrupoMedianteDatos() throws ClubException{
@@ -64,7 +73,10 @@ public class clubDeportivoTest {
         Integer tarifa = 50;
         String[] datos = { "miguel", "jose", "20", matriculados.toString(), tarifa.toString() };
         double ingresosAnteriores = club.ingresos();
-        club.anyadirActividad(grupo);
+
+        // aquí habías puesto antadirActividad(grupo) en vez de antadirActividad(datos) (creo q es como yo digo)
+        club.anyadirActividad(datos);
+
         assertEquals(ingresosAnteriores + tarifa * matriculados, club.ingresos());
     }
 
@@ -72,29 +84,93 @@ public class clubDeportivoTest {
     @DisplayName("Añadir grupo con datos invalidos")
     void anyadirGrupoConDatosInvalidos() throws ClubException{
         String[] datos = { "miguel", "jose", "estoNoEsUnNumero", "estoTampoco", "estoAunMenos" };
+
         assertThrows(ClubException.class, () -> club.anyadirActividad(datos));
     }
+
     @Test
     @DisplayName("Las plazas libres son correctas")
     void plazasLibresCorrectas() throws ClubException{
         club.anyadirActividad(grupo);
         int plazasLibres = grupo.plazasLibres();
         String actividad = grupo.getActividad();
+
         assertEquals(club.plazasLibres(actividad), plazasLibres);
     }
+    @Test
+    @DisplayName("Plazas libres de una actividad no existente")
+    void plazasLibresNoExistente() throws ClubException{
+        club.anyadirActividad(grupo);
+        int plazasLibres = club.plazasLibres("noExistente");
+
+        assertEquals(plazasLibres, 0);
+    }
+
     @Test
     @DisplayName("Matricular demasiadas personas")
     void matricularDemasiasPersonas() throws ClubException{
         club.anyadirActividad(grupo);
+
         assertThrows(ClubException.class, () -> club.matricular(grupo.getActividad(), 99999));
     }
     @Test
-    @DisplayName("Matricular personas adecuadas")
-    void matricularPersonasAdecuadas() throws ClubException{
+    @DisplayName("Matricular personas para que los grupos se queden justo llenos")
+    void matricularPersonasAdecuadasJusto() throws ClubException{
         club.anyadirActividad(grupo);
         int plazasLibres = grupo.plazasLibres();
         String actividad = grupo.getActividad();
+
         club.matricular(actividad, plazasLibres);
+
         assertEquals(0, grupo.plazasLibres());
+    }
+    @Test
+    @DisplayName("Matricular personas para que la actividad no se quede llena")
+    void matricularPersonasAdecuadas() throws ClubException{
+        club.anyadirActividad(grupo);
+        String actividad = grupo.getActividad();
+        int plazasAntes = grupo.plazasLibres();
+
+        club.matricular(actividad,2);
+
+        assertEquals(plazasAntes - 2, grupo.plazasLibres());
+    }
+    // Este test falla ya que no se comprueba si el numero de personas
+    // es negativo y se debería hacer
+    /*
+    @Test
+    @DisplayName("Matricular personas negativas")
+    void matricularPersonasNegativas() throws ClubException{
+        club.anyadirActividad(grupo);
+        String actividad = grupo.getActividad();
+
+        assertThrows(ClubException.class, () -> club.matricular(actividad, -1));
+    }
+    */
+    @Test
+    @DisplayName("toString() correcto con un grupo")
+    void toStringFormatoCorrecto() throws ClubException {
+        club.anyadirActividad(grupo);
+        String  correcto = "Sons --> [ " + grupo.toString() + " ]";
+
+        assertEquals(correcto, club.toString());
+    }
+
+    @Test
+    @DisplayName("toString() correcto sin grupos")
+    void toStringClubVacio() {
+        String correcto = "Sons --> [  ]";
+        assertEquals(correcto, club.toString());
+    }
+
+    @Test
+    @DisplayName("toString() con múltiples grupos")
+    void toStringVariosGrupos() throws ClubException {
+        Grupo grupo2 = new Grupo("Fortniteor", "pubg", 15, 5, 60);
+        club.anyadirActividad(grupo);
+        club.anyadirActividad(grupo2);
+
+        String esperado = "Sons --> [ " + grupo.toString() + ", " + grupo2.toString() + " ]";
+        assertEquals(esperado, club.toString());
     }
 }

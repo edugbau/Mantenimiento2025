@@ -161,4 +161,11 @@ public class grupoTest {
         Grupo nuevoGrupo = new Grupo("miguel","miguelito",1,1,1);
         assertNotEquals(miGrupo.toString(), nuevoGrupo.toString());
     }
+
+    // POR LO QUE SEA hay un get publico
+    @Test
+    @DisplayName("getCodigo devuelve el codigo correcto")
+    void getCodigoTest() throws ClubException {
+        assertEquals("Futbol", miGrupo.getCodigo());
+    }
 }
