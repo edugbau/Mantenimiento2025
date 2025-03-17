@@ -84,6 +84,19 @@ public class clubDeportivoTest {
 
         assertThrows(ClubException.class, () -> club.anyadirActividad(datos));
     }
+    /*
+    No se comprueba que no se pueda añadir un grupo con menos datos de los necesarios
+
+    @Test
+    @DisplayName("Añadir grupo con menos datos de los necesarios")
+    void anyadirGrupoConMenosDatos() throws ClubException{
+        Integer matriculados = 10;
+        Integer tarifa = 50;
+        String[] datos = { "miguel", "jose", "20", matriculados.toString()};
+
+        assertThrows(ClubException.class, () -> club.anyadirActividad(datos));
+    }
+    */
 
     @Test
     @DisplayName("Las plazas libres son correctas")
