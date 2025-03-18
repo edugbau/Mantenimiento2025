@@ -97,7 +97,32 @@ public class clubDeportivoTest {
         assertThrows(ClubException.class, () -> club.anyadirActividad(datos));
     }
     */
+    /* Esto da fallo, ya que no se vigila que al añadir un nuevo grupo se exceda la capacidad
+    @Test
+    @DisplayName("Añadir más grupos de los permitidos debe lanzar excepción")
+    void anyadirGrupoExcediendoCapacidad() throws ClubException {
+        // Arrange
+        ClubDeportivo clubPequeno = new ClubDeportivo("Club Test", 1);
+        Grupo grupo1 = new Grupo("G1", "Natación", 20, 5, 30);
+        Grupo grupo2 = new Grupo("G2", "Tenis", 15, 10, 40);
 
+        // Act & Assert
+        clubPequeno.anyadirActividad(grupo1); // Debería funcionar
+        assertThrows(ClubException.class, () -> clubPequeno.anyadirActividad(grupo2)); // Debería fallar
+    }
+    */
+
+    @Test
+    @DisplayName("Actualizar plazas por debajo de matriculados debería fallar")
+    void actualizarPlazasPorDebajoDeMatriculados() throws ClubException {
+        // Arrange
+        club.anyadirActividad(grupo); // grupo tiene 10 matriculados de 20 plazas
+        Grupo grupoActualizado = new Grupo(grupo.getCodigo(), grupo.getActividad(), 5, 0, 50);
+
+        // Act & Assert
+        // Al intentar actualizar a 5 plazas cuando hay 10 matriculados debería fallar
+        assertThrows(ClubException.class, () -> club.anyadirActividad(grupoActualizado));
+    }
     @Test
     @DisplayName("Las plazas libres son correctas")
     void plazasLibresCorrectas() throws ClubException{
