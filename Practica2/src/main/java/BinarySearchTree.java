@@ -112,14 +112,26 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
 
     @Override
     public int size() {
-        //TODO
-        return 0;
+        int n = 1;
+        if (this.left != null) {
+            n += this.left.size();
+        }
+        if (this.right != null) {
+            n += this.right.size();
+        }
+        return n;
     }
 
     @Override
     public int depth() {
-        // TODO
-        return 0;
+        int leftDepth = 0, rightDepth = 0;
+        if (this.left != null) {
+            leftDepth = this.left.depth();
+        }
+        if (this.right != null) {
+            rightDepth = this.right.depth();
+        }
+        return 1 + Integer.max(leftDepth, rightDepth);
     }
 
     // Complex operations
