@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClubDeportivoAltoRendimiento.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">junit5-mps-uma</a> &gt; <a href="index.source.html" class="el_package">clubDeportivo</a> &gt; <span class="el_source">ClubDeportivoAltoRendimiento.java</span></div><h1>ClubDeportivoAltoRendimiento.java</h1><pre class="source lang-java linenums">package clubDeportivo;
+
+
+public class ClubDeportivoAltoRendimiento extends ClubDeportivo{
+	private int maximoPersonasGrupo;
+	private double incremento;
+	
+	public ClubDeportivoAltoRendimiento(String nombre, int maximo, double incremento) throws ClubException {
+<span class="fc" id="L9">		super(nombre);</span>
+<span class="fc bfc" id="L10" title="All 4 branches covered.">		if (maximo&lt;=0 || incremento&lt;=0) {</span>
+<span class="fc" id="L11">			throw new ClubException(&quot;ERRORES: valores 0 o negativos.&quot;);</span>
+		}
+<span class="fc" id="L13">		maximoPersonasGrupo=maximo;</span>
+<span class="fc" id="L14">		this.incremento=incremento;</span>
+<span class="fc" id="L15">	}</span>
+	
+	public ClubDeportivoAltoRendimiento(String nombre, int tam, int maximo, double incremento) throws ClubException {
+<span class="fc" id="L18">		super(nombre,tam);</span>
+<span class="fc bfc" id="L19" title="All 4 branches covered.">		if (maximo&lt;=0 || incremento&lt;=0) {</span>
+<span class="fc" id="L20">			throw new ClubException(&quot;ERRORES: valores 0 o negativos.&quot;);</span>
+		}
+<span class="fc" id="L22">		maximoPersonasGrupo=maximo;</span>
+<span class="fc" id="L23">		this.incremento=incremento;</span>
+<span class="fc" id="L24">	}</span>
+	
+	// El test.club de alto rendimiento tiene limitadas las plazas. Si el número de plazas que se recibe como parametro es mayor que el permitido,
+	// se establece su valor al maximo permitido por grupo para el test.club.
+	public void anyadirActividad(String[] datos) throws ClubException {
+<span class="fc bfc" id="L29" title="All 2 branches covered.">		if (datos.length&lt;5) {</span>
+<span class="fc" id="L30">			throw new ClubException (&quot;ERROR: faltan datos&quot;);</span>
+		}
+		try {
+<span class="fc" id="L33">			int plazas = Integer.parseInt(datos[2]);</span>
+<span class="fc" id="L34">			int matriculados = Integer.parseInt(datos[3]);</span>
+<span class="fc" id="L35">			double tarifa = Double.parseDouble(datos[4]);</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">			if (plazas &gt; maximoPersonasGrupo) {</span>
+<span class="fc" id="L37">				plazas=maximoPersonasGrupo;</span>
+			}
+<span class="fc" id="L39">			Grupo g = new Grupo(datos[0], datos[1], plazas, matriculados, tarifa);</span>
+<span class="fc" id="L40">			super.anyadirActividad(g);</span>
+<span class="fc" id="L41">		} catch (NumberFormatException e) {</span>
+<span class="fc" id="L42">			throw new ClubException(&quot;ERROR: formato de número incorrecto&quot;);</span>
+		}
+<span class="fc" id="L44">	}</span>
+	
+	// Los ingresos del test.club tienen
+	public double ingresos() {
+<span class="fc" id="L48">		double cantidad = super.ingresos();</span>
+<span class="fc" id="L49">		return cantidad+cantidad*(incremento/100);</span>
+	}
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
