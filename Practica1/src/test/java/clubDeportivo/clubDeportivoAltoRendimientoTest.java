@@ -2,6 +2,7 @@ package clubDeportivo;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+//MIEMBROS: Eduardo González Bautista y Juan Manuel Valenzuela González
 
 public class clubDeportivoAltoRendimientoTest
 {

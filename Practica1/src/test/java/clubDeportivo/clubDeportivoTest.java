@@ -2,7 +2,8 @@ package clubDeportivo;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
-
+//MIEMBROS: Eduardo González Bautista y Juan Manuel Valenzuela González
+//Metodos que encontraron errores: anyadirGrupoConMenosDatos(), anyadirGrupoExcediendoCapacidad(), matricularPersonasNegativas()
 public class clubDeportivoTest {
     ClubDeportivo club;
     Grupo grupo;
@@ -84,20 +85,20 @@ public class clubDeportivoTest {
 
         assertThrows(ClubException.class, () -> club.anyadirActividad(datos));
     }
-    /*
-    No se comprueba que no se pueda añadir un grupo con menos datos de los necesarios
+
+    //No se comprueba que no se pueda añadir un grupo con menos datos de los necesarios
 
     @Test
     @DisplayName("Añadir grupo con menos datos de los necesarios")
     void anyadirGrupoConMenosDatos() throws ClubException{
         Integer matriculados = 10;
         Integer tarifa = 50;
-        String[] datos = { "miguel", "jose", "20", matriculados.toString()};
+        String[] datos = { "miguel", "jose", "20"};
 
         assertThrows(ClubException.class, () -> club.anyadirActividad(datos));
     }
-    */
-    /* Esto da fallo, ya que no se vigila que al añadir un nuevo grupo se exceda la capacidad
+
+    // Esto da fallo, ya que no se vigila que al añadir un nuevo grupo se exceda la capacidad
     @Test
     @DisplayName("Añadir más grupos de los permitidos debe lanzar excepción")
     void anyadirGrupoExcediendoCapacidad() throws ClubException {
@@ -110,7 +111,7 @@ public class clubDeportivoTest {
         clubPequeno.anyadirActividad(grupo1); // Debería funcionar
         assertThrows(ClubException.class, () -> clubPequeno.anyadirActividad(grupo2)); // Debería fallar
     }
-    */
+
 
     @Test
     @DisplayName("Actualizar plazas por debajo de matriculados debería fallar")
@@ -186,7 +187,7 @@ public class clubDeportivoTest {
     }
     // Este test falla ya que no se comprueba si el numero de personas
     // es negativo y se debería hacer
-    /*
+
     @Test
     @DisplayName("Matricular personas negativas")
     void matricularPersonasNegativas() throws ClubException{
@@ -195,7 +196,7 @@ public class clubDeportivoTest {
 
         assertThrows(ClubException.class, () -> club.matricular(actividad, -1));
     }
-    */
+
     @Test
     @DisplayName("toString() correcto con un grupo")
     void toStringFormatoCorrecto() throws ClubException {

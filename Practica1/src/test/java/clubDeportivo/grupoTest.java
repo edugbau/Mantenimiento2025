@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+//MIEMBROS: Eduardo González Bautista y Juan Manuel Valenzuela González
 
 public class grupoTest {
     Grupo miGrupo;

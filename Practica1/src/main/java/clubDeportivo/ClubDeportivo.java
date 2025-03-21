@@ -32,6 +32,9 @@ public class ClubDeportivo {
 	}
 
 	public void anyadirActividad(String[] datos) throws ClubException {
+		if (datos.length != 5) {
+			throw new ClubException("ERROR: El numero de datos no es correcto");
+		}
 		try {
 			int plazas = Integer.parseInt(datos[2]);
 			int matriculados = Integer.parseInt(datos[3]);
@@ -46,6 +49,9 @@ public class ClubDeportivo {
 	public void anyadirActividad(Grupo g) throws ClubException {
 		if (g==null){ // ADDME: anaydido para comprobar los grupos nulos
 			throw new ClubException("ERROR: el grupo es nulo");
+		}
+		if (ngrupos == grupos.length) {
+			throw new ClubException("ERROR: maximo numero de grupos permitido");
 		}
 		int pos = buscar(g);
 		if (pos == -1) { // El grupo es nuevo
@@ -72,6 +78,9 @@ public class ClubDeportivo {
 		int plazas = plazasLibres(actividad);
 		if (plazas < npersonas) {
 			throw new ClubException("ERROR: no hay suficientes plazas libres para esa actividad en el test.club.");
+		}
+		if (npersonas <= 0){
+			throw new ClubException("ERROR: No se puede matricular 0 o menos personas");
 		}
 		int i = 0;
 		while (i < ngrupos && npersonas > 0) {
