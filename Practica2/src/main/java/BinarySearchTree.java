@@ -55,6 +55,9 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
 
     @Override
     public boolean contains(T value) {
+        if(value == null){
+            throw new BinarySearchTreeException("El valor no puede ser nulo.");
+        }
         if (this.isLeaf()) {
             return this.value.equals(value);
         } else if (this.value.equals(value)) {
@@ -85,10 +88,15 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
     }
 
     @Override
-    public void removeBranch(T value){
+    public void removeBranch(T value){ // no hay que comprobar si el valor es nulo ya que ya lo hace el contains
         if  (!this.contains(value)){ // esto va a tener que ser cambiado
             throw new BinarySearchTreeException("El valor no se encuentra en el árbol");
+        } else {
+            removeBranchRecursive(value);
         }
+    }
+
+    private void removeBranchRecursive(T value){
         if(this.value.equals(value)){
             this.delete();
         } else if(this.left != null && comparator.compare(this.value, value) < 0){
@@ -96,8 +104,8 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
         } else {
             this.right.removeBranch(value);
         }
-
     }
+
     private void delete(){
         if(this.left != null){
             this.left.delete();
