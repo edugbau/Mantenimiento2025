@@ -37,6 +37,9 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
     }
 
     public BinarySearchTree(Comparator<T> comparator) {
+        if (comparator == null) {
+            throw new BinarySearchTreeException("El comparador no puede ser nulo.");
+        }
         this.comparator = comparator;
         this.value = null;
         this.left = null;
@@ -44,8 +47,23 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
     }
 
     @Override
-    public void insert(T value) {
-        this.value = value;
+    public void insert(T value) { // los duplicados los va a insertar a la derecha
+        if(this.value == null){
+            this.value = value;
+        } else {
+            if (comparator.compare(value, this.value) < 0) {
+                if (this.left == null) {
+                    this.left = new BinarySearchTree<>(this.comparator);
+                }
+                this.left.insert(value);
+
+            } else {
+                if (this.right == null) {
+                    this.right = new BinarySearchTree<>(this.comparator);
+                }
+                this.right.insert(value);
+            }
+        }
     }
 
     @Override
@@ -58,11 +76,12 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
         if(value == null){
             throw new BinarySearchTreeException("El valor no puede ser nulo.");
         }
-        if (this.isLeaf()) {
-            return this.value.equals(value);
-        } else if (this.value.equals(value)) {
+        if (this.value == null) {
+            return false;
+        }
+        else if (this.value.equals(value)) {
             return true;
-        } else if (comparator.compare(this.value, value) < 0) {
+        } else if (comparator.compare(value, this.value) < 0) {
             return this.left != null && this.left.contains(value);
         } else {
             return this.right != null && this.right.contains(value);
@@ -89,29 +108,36 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
 
     @Override
     public void removeBranch(T value){ // no hay que comprobar si el valor es nulo ya que ya lo hace el contains
-        if  (!this.contains(value)){ // esto va a tener que ser cambiado
+        if  (!this.contains(value)){
             throw new BinarySearchTreeException("El valor no se encuentra en el árbol");
+        }
+        removeBranchRecursive(value,false,null);
+
+    }
+
+    private void removeBranchRecursive(T value,boolean left,BinarySearchTree<T> parent){
+        if (this.left != null && comparator.compare(value, this.value) < 0){
+            this.left.removeBranchRecursive(value,true,this);
+        } else if(this.right != null && comparator.compare(value, this.value) > 0){
+            this.right.removeBranchRecursive(value,false,this);
         } else {
-            removeBranchRecursive(value);
+            this.delete(left,parent); // hay que borrar el arbol hasta abajo
         }
     }
 
-    private void removeBranchRecursive(T value){
-        if(this.value.equals(value)){
-            this.delete();
-        } else if(this.left != null && comparator.compare(this.value, value) < 0){
-            this.left.removeBranch(value);
-        } else {
-            this.right.removeBranch(value);
-        }
-    }
-
-    private void delete(){
+    private void delete(boolean left,BinarySearchTree<T> parent){
         if(this.left != null){
-            this.left.delete();
+            this.left.delete(true,this);
         }
         if(this.right != null){
-            this.right.delete();
+            this.right.delete(false,this);
+        }
+        if (parent != null) { // Si no es la raíz
+            if (left) { // Si es el hijo izquierdo se va a tener que eliminar desde el padre
+                parent.left = null;
+            } else {
+                parent.right = null;
+            }
         }
         this.value = null;
         this.left = null;
