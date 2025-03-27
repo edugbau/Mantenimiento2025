@@ -288,7 +288,35 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
 
     @Override
     public void balance() {
+        if (this.value == null) {
+            return;
+        }
+        List<T> ordenados = this.inOrder();
+        this.value = null;
+        this.left = null;
+        this.right = null;
+        balanceRecursive(ordenados, this);
+    }
 
+    private void balanceRecursive(List<T> ordenados, BinarySearchTree<T> arbol) {
+        if (ordenados.isEmpty()) {
+            return;
+        }
+
+        int medio = ordenados.size() / 2;
+        arbol.insert(ordenados.get(medio));
+
+        // Subárbol izquierdo
+        List<T> izquierdos = ordenados.subList(0, medio);
+        if (!izquierdos.isEmpty()) {
+            balanceRecursive(izquierdos, arbol);
+        }
+
+        // Subárbol derecho
+        List<T> derechos = ordenados.subList(medio + 1, ordenados.size());
+        if (!derechos.isEmpty()) {
+            balanceRecursive(derechos, arbol);
+        }
     }
 
 }
