@@ -73,6 +73,25 @@ public interface BinarySearchTreeStructure<T> {
     int depth();
 
     // Complex operations
-    // (Estas operaciones se incluirán más adelante para ser realizadas en la segunda
-    // sesión de laboratorio de esta práctica)
+
+    /**
+     * Removes the first occurrence of the specified element from this binary search tree, if it is present.
+     *
+     * @param value to be removed from this binary tree, if present
+     * @throws BinaryTreeException if the element is not present in the binary tree
+     */
+    void removeValue(T value);
+
+    /**
+     * Returns a List of all the values of the tree in order.
+     *
+     * @return a List of all the values of the tree in order
+     */
+    List<T> inOrder();
+
+    /**
+     * Balance the binary search tree. Making the depth of the
+     * left and right subtrees of every node differ by at most one.
+     */
+    void balance();
 }

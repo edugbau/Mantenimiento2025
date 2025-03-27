@@ -111,9 +111,6 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
 
     @Override
     public void removeBranch(T value){ // no hay que comprobar si el valor es nulo ya que ya lo hace el contains
-        if (value == null){
-            throw new BinarySearchTreeException("El valor no puede ser nulo.");
-        }
         if  (!this.contains(value)){
             throw new BinarySearchTreeException("El valor no se encuentra en el árbol");
         }
@@ -180,7 +177,52 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
         return 1 + Integer.max(leftDepth, rightDepth);
     }
 
-    // Complex operations
-    // (Estas operaciones se incluirán más adelante para ser realizadas en la segunda
-    // sesión de laboratorio de esta práctica)
+    @Override
+    public void removeValue(T value) {
+        if(!this.contains(value)){ // no hay que comprobar que value sea null porque lo hace le contains
+            throw new BinarySearchTreeException("El valor no se encuentra en el árbol");
+        }
+
+    }
+
+    private void removeValueRecursive(T value,boolean left,BinarySearchTree<T> parent){
+        if (this.left != null && comparator.compare(value, this.value) < 0){
+            this.left.removeValueRecursive(value,true,this);
+        } else if(this.right != null && comparator.compare(value, this.value) > 0){
+            this.right.removeValueRecursive(value,false,this);
+        } else {
+            deletevalue(value,left,parent);
+        }
+    }
+
+    private void deletevalue(T value,boolean left,BinarySearchTree<T> parent){
+        if(this.left != null){
+
+        }
+        if (parent != null && this.left == null && this.right == null) { // Si no es la raíz
+            if (left) { // Si es el hijo izquierdo se va a tener que eliminar desde el padre
+                parent.left = null;
+            } else {
+                parent.right = null;
+            }
+            this.value = null;
+            this.left = null;
+            this.right = null;
+
+        }
+
+        T valueMax = this.left.maximum();
+    }
+
+
+    @Override
+    public List<T> inOrder() {
+        return List.of();
+    }
+
+    @Override
+    public void balance() {
+
+    }
+
 }
