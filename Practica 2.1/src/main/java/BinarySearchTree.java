@@ -191,15 +191,55 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
         } else if(this.right != null && comparator.compare(value, this.value) > 0){
             this.right.removeValueRecursive(value,false,this);
         } else {
-            deletevalue(value,left,parent);
+            // Si tiene hijo izquierdo
+            if(this.left != null){
+                T valueMax = this.left.maximum();
+                this.value = valueMax;
+                deletevalueLeaf(valueMax,true,this);
+
+                // si tiene hijo derecho pero no izquierdo y no es la raiz
+            } else if(parent != null && this.right != null && this.left == null){
+                this.value = null;
+                parent.right = this.right;
+                this.right = null;
+
+                // si tiene hijo derecho peor no izquierdo y es la raiz
+            } else if (parent == null && this.right != null && this.left == null){
+                this.value = this.right.value;
+                BinarySearchTree<T> aux = this.right;
+                this.right = aux.right;
+                this.left = aux.left;
+                aux.value = null;
+                aux.right = null;
+                aux.left = null;
+            }
+            // si no tiene hijos
+            else if (this.left == null && this.right == null) {
+                // y es la raiz
+                if (parent == null){
+                    this.value = null;
+
+                    // si no es la raiz
+                } else {
+                    if (left) {
+                        parent.left = null;
+                    } else {
+                        parent.right = null;
+                    }
+                    this.value = null;
+                    this.left = null;
+                    this.right = null;
+                }
+            }
         }
     }
 
-    private void deletevalue(T value,boolean left,BinarySearchTree<T> parent){
-        if(this.left != null){
-
-        }
-        if (parent != null && this.left == null && this.right == null) { // Si no es la raíz
+    private void deletevalueLeaf(T value,boolean left,BinarySearchTree<T> parent){
+        if (this.left != null && comparator.compare(value, this.value) < 0){
+            this.left.removeValueRecursive(value,true,this);
+        } else if(this.right != null && comparator.compare(value, this.value) > 0){
+            this.right.removeValueRecursive(value,false,this);
+        } else {
             if (left) { // Si es el hijo izquierdo se va a tener que eliminar desde el padre
                 parent.left = null;
             } else {
@@ -208,10 +248,7 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
             this.value = null;
             this.left = null;
             this.right = null;
-
         }
-
-        T valueMax = this.left.maximum();
     }
 
 
