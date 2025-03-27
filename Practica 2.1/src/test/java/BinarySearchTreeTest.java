@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Comparator;
+import java.util.List;
 
 @DisplayName("Pruebas Exhaustivas de Árbol de Búsqueda Binario")
 class BinarySearchTreeTest {
@@ -393,6 +394,14 @@ class BinarySearchTreeTest {
     }
 
     @Test
+    @DisplayName("Minimo con arbol vacío lanza excepción")
+    public void minimo_arbolVacio_daExcepcion(){
+        assertThrows(BinarySearchTreeException.class, () -> {
+            arbolEnteros.minimum();
+        });
+    }
+
+    @Test
     @DisplayName("Obtener máximo en árbol con un elemento")
     void maximo_unElemento_loDevuelve() {
         // Arrange
@@ -419,6 +428,14 @@ class BinarySearchTreeTest {
         // Assert
         assertEquals(7, maximum);
     }
+    @Test
+    @DisplayName("Maximo con arbol vacío lanza excepción")
+    public void maximo_arbolVacio_daExcepcion(){
+        assertThrows(BinarySearchTreeException.class, () -> {
+            arbolEnteros.maximum();
+        });
+    }
+
     @Test
     @DisplayName("Eliminar elemento nulo lanza excepcion")
     void eliminar_ElementoNulo_daExcepcion() {
@@ -592,5 +609,57 @@ class BinarySearchTreeTest {
 
         // Assert
         assertEquals(3, depth);
+    }
+    @Test
+    @DisplayName("inOrder de árbol vacío devuelve una lista vacía")
+    public void inOrder_arbolVacio_daListaVacia(){
+        //Act
+        List<Integer> lista = arbolEnteros.inOrder();
+        //Assert
+        assertEquals(0, lista.size());
+    }
+    @Test
+    @DisplayName("inOrder con un solo elemento devuelve solo la lista con el elemento")
+    public void inOrder_hoja_daSoloUnElemento(){
+        //Arrange
+        arbolEnteros.insert(5);
+        //Act
+        List<Integer> lista = arbolEnteros.inOrder();
+        //Assert
+        assertEquals(List.of(5), lista);
+    }
+    @Test
+    @DisplayName("inOrder con dos elementos los devuelve en orden")
+    public void inOrder_dosElementos_daEnOrden(){
+        //Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+        //Act
+        List<Integer> lista = arbolEnteros.inOrder();
+        //Assert
+        assertEquals(List.of(3,5), lista);
+    }
+    @Test
+    @DisplayName("inOrder con dos elementos los devuelve en orden")
+    public void inOrder_dosElementos_daEnOrden2(){
+        //Arrange
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(5);
+        //Act
+        List<Integer> lista = arbolEnteros.inOrder();
+        //Assert
+        assertEquals(List.of(3,5), lista);
+    }
+    @Test
+    @DisplayName("inOrder con elementos anidados los da en orden")
+    public void inOrder_elementosAnidados_daEnOrden(){
+        //Arrange
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(4);
+        //Act
+        List<Integer> lista = arbolEnteros.inOrder();
+        //Assert
+        assertEquals(List.of(3,4,5), lista);
     }
 }

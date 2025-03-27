@@ -93,6 +93,13 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
 
     @Override
     public T minimum() {
+        if (this.value == null) {
+            throw new BinarySearchTreeException("El árbol no puede ser vacío.");
+        }
+        return this.minimumRecursive();
+    }
+
+    private T minimumRecursive(){
         if(this.left == null){
             return this.value;
         } else {
@@ -100,8 +107,15 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
         }
     }
 
+
     @Override
     public T maximum() {
+        if(this.value == null){
+            throw new BinarySearchTreeException("El árbol no puede estar vacío");
+        }
+        return this.maximumRecursive();
+    }
+    private T maximumRecursive(){
         if (this.right == null){
             return this.value;
         } else {
@@ -254,7 +268,22 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
 
     @Override
     public List<T> inOrder() {
-        return List.of();
+        List<T> res = new ArrayList<>();
+        return this.value == null ? res : inOrderRecursive(res);
+    }
+    private List<T> inOrderRecursive(List<T> lista){
+        if (this.isLeaf()) {
+            lista.add(this.value);
+            return lista;
+        }
+        if (this.left != null) {
+            lista = this.left.inOrderRecursive(lista);
+        }
+        lista.add(this.value);
+        if (this.right != null) {
+            lista = this.right.inOrderRecursive(lista);
+        }
+        return lista;
     }
 
     @Override

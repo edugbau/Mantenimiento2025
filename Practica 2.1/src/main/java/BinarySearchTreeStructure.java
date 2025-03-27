@@ -78,7 +78,7 @@ public interface BinarySearchTreeStructure<T> {
      * Removes the first occurrence of the specified element from this binary search tree, if it is present.
      *
      * @param value to be removed from this binary tree, if present
-     * @throws BinaryTreeException if the element is not present in the binary tree
+     * @throws BinarySearchTreeException if the element is not present in the binary tree
      */
     void removeValue(T value);
 
