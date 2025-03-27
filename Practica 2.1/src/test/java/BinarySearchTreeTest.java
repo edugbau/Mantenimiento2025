@@ -23,7 +23,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Crear árbol con comparador nulo debe lanzar excepción")
-    void crearArbolConComparadorNulo() {
+    void crearArbolConComparadorNulo_DaExcepcion() {
         // Act & Assert
         assertThrows(BinarySearchTreeException.class, () -> {
             new BinarySearchTree<Integer>(null);
@@ -32,7 +32,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Árbol recién creado debe estar vacío")
-    void arbolRecienCreadoEstaVacio() {
+    void constructor_daArbolVacio() {
         // Act
         String renderResult = arbolEnteros.render();
 
@@ -42,7 +42,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Insertar primer elemento en árbol vacío")
-    void insertarPrimerElemento() {
+    void insertarPrimerElemento_arbolVacio_funciona() {
         // Act
         arbolEnteros.insert(5);
 
@@ -52,7 +52,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Insertar múltiples elementos respetando orden")
-    void insertarMultiplesElementos() {
+    void insertar_MultiplesElementos_funcionaBien() {
         // Act
         arbolEnteros.insert(5);
         arbolEnteros.insert(3);
@@ -64,7 +64,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Insertar elementos duplicados van a la derecha")
-    void insertarElementosDuplicados() {
+    void insertar_ElementosDuplicados_vaALaDerecha() {
         // Act
         arbolEnteros.insert(5);
         arbolEnteros.insert(5);
@@ -75,7 +75,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Insertar elemento nulo da error")
-    void insertarElementosNulo() {
+    void insertar_ElementosNulo_daExcepcion() {
         // Act & Assert
         assertThrows(BinarySearchTreeException.class, () -> {
             arbolEnteros.insert(null);
@@ -84,7 +84,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Buscar elemento en árbol vacío debe devolver falso")
-    void buscarEnArbolVacio() {
+    void buscar_ArbolVacio_daFalso() {
         // Act
         boolean containsResult = arbolEnteros.contains(5);
 
@@ -94,7 +94,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Buscar elemento existente debe devolver verdadero")
-    void buscarElementoExistente() {
+    void buscar_ElementoExistente_daTrue() {
         // Arrange
         arbolEnteros.insert(5);
         arbolEnteros.insert(3);
@@ -108,7 +108,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Buscar elemento no existente debe devolver falso")
-    void buscarElementoNoExistente() {
+    void buscar_ElementoNoExistente_daFalse() {
         // Arrange
         arbolEnteros.insert(5);
         arbolEnteros.insert(3);
@@ -122,7 +122,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Buscar con valor nulo debe lanzar excepción")
-    void buscarValorNulo() {
+    void buscar_ValorNulo_daExcepcion() {
         // Act & Assert
         assertThrows(BinarySearchTreeException.class, () -> {
             arbolEnteros.contains(null);
@@ -131,7 +131,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Árbol vacío no es hoja")
-    void arbolVacioNoEsHoja() {
+    void isLeaf_arbolVacio_daFalse() {
         // Act
         boolean isLeaf = arbolEnteros.isLeaf();
 
@@ -141,7 +141,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Árbol con un solo elemento es hoja")
-    void arbolConUnElementoEsHoja() {
+    void isLeaf_unElemento_daTrue() {
         // Arrange
         arbolEnteros.insert(5);
 
@@ -154,7 +154,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Árbol con más de un elemento no es hoja")
-    void arbolConVariosElementosNoEsHoja() {
+    void arbol_ConVariosElementos_NoEsHoja() {
         // Arrange
         arbolEnteros.insert(5);
         arbolEnteros.insert(3);
@@ -168,7 +168,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Obtener mínimo en árbol con un elemento")
-    void obtenerMinimoConUnElemento() {
+    void minimo_unElemento_loDevuelve() {
         // Arrange
         arbolEnteros.insert(5);
 
@@ -181,7 +181,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Obtener mínimo en árbol con múltiples elementos")
-    void obtenerMinimoConVariosElementos() {
+    void minimo_variosElementos_devuelveMinimo() {
         // Arrange
         arbolEnteros.insert(5);
         arbolEnteros.insert(3);
@@ -196,7 +196,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Obtener máximo en árbol con un elemento")
-    void obtenerMaximoConUnElemento() {
+    void maximo_unElemento_loDevuelve() {
         // Arrange
         arbolEnteros.insert(5);
 
@@ -209,7 +209,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Obtener máximo en árbol con múltiples elementos")
-    void obtenerMaximoConVariosElementos() {
+    void maximo_variosElementos_devuelveMaximo() {
         // Arrange
         arbolEnteros.insert(5);
         arbolEnteros.insert(3);
@@ -223,12 +223,12 @@ class BinarySearchTreeTest {
     }
     @Test
     @DisplayName("Eliminar elemento nulo lanza excepcion")
-    void eliminarElementoNulo() {
+    void eliminar_ElementoNulo_daExcepcion() {
         assertThrows(BinarySearchTreeException.class, () -> {arbolEnteros.removeBranch(null);});
     }
     @Test
     @DisplayName("Eliminar rama de elemento existente")
-    void eliminarRamaElementoExistente() {
+    void eliminar_RamaElementoExistente_funciona() {
         // Arrange
         arbolEnteros.insert(5);
         arbolEnteros.insert(3);
@@ -243,7 +243,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Eliminar rama de elemento no existente lanza excepción")
-    void eliminarRamaElementoNoExistente() {
+    void eliminarRama_ElementoNoExistente_daExcepcion() {
         // Arrange
         arbolEnteros.insert(5);
 
@@ -255,7 +255,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Tamaño de árbol vacío")
-    void tamañoArbolVacio() {
+    void tamaño_ArbolVacio_da0() {
         // Act
         int size = arbolEnteros.size();
 
@@ -265,7 +265,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Tamaño de árbol con elementos")
-    void tamañoArbolConElementos() {
+    void tamaño_ArbolConElementos_funciona() {
         // Arrange
         arbolEnteros.insert(5);
         arbolEnteros.insert(3);
@@ -280,7 +280,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Profundidad de árbol vacío")
-    void profundidadArbolVacio() {
+    void profundidad_ArbolVacio_da0() {
         // Act
         int depth = arbolEnteros.depth();
 
@@ -290,7 +290,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Profundidad de árbol con elementos")
-    void profundidadArbolConElementos() {
+    void profundidad_ArbolConElementos_funciona() {
         // Arrange
         arbolEnteros.insert(5);
         arbolEnteros.insert(3);

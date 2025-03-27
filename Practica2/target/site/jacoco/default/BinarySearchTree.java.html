@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BinarySearchTree.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">junit5-mps-uma</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">BinarySearchTree.java</span></div><h1>BinarySearchTree.java</h1><pre class="source lang-java linenums">/*
+Integrantes:
+Eduardo González Bautista
+Juan Manuel Valenzuela González
+ */
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.ArrayList;
+
+public class BinarySearchTree&lt;T&gt; implements BinarySearchTreeStructure&lt;T&gt; {
+    private Comparator&lt;T&gt; comparator;
+    private T value;
+    private BinarySearchTree&lt;T&gt; left;
+    private BinarySearchTree&lt;T&gt; right;
+
+    public String render(){
+<span class="fc" id="L18">        String render = &quot;&quot;;</span>
+
+<span class="fc bfc" id="L20" title="All 2 branches covered.">        if (value != null) {</span>
+<span class="fc" id="L21">            render += value.toString();</span>
+        }
+
+<span class="fc bfc" id="L24" title="All 4 branches covered.">        if (left != null || right != null) {</span>
+<span class="fc" id="L25">            render += &quot;(&quot;;</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">            if (left != null) {</span>
+<span class="fc" id="L27">                render += left.render();</span>
+            }
+<span class="fc" id="L29">            render += &quot;,&quot;;</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">            if (right != null) {</span>
+<span class="fc" id="L31">                render += right.render();</span>
+            }
+<span class="fc" id="L33">            render += &quot;)&quot;;</span>
+        }
+
+<span class="fc" id="L36">        return render;</span>
+    }
+
+<span class="fc" id="L39">    public BinarySearchTree(Comparator&lt;T&gt; comparator) {</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if (comparator == null) {</span>
+<span class="fc" id="L41">            throw new BinarySearchTreeException(&quot;El comparador no puede ser nulo.&quot;);</span>
+        }
+<span class="fc" id="L43">        this.comparator = comparator;</span>
+<span class="fc" id="L44">        this.value = null;</span>
+<span class="fc" id="L45">        this.left = null;</span>
+<span class="fc" id="L46">        this.right = null;</span>
+<span class="fc" id="L47">    }</span>
+
+    @Override
+    public void insert(T value) { // los duplicados los va a insertar a la derecha
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if(value == null){</span>
+<span class="fc" id="L52">            throw new BinarySearchTreeException(&quot;El valor no puede ser nulo.&quot;);</span>
+        }
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if(this.value == null){</span>
+<span class="fc" id="L55">            this.value = value;</span>
+        } else {
+<span class="fc bfc" id="L57" title="All 2 branches covered.">            if (comparator.compare(value, this.value) &lt; 0) {</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">                if (this.left == null) {</span>
+<span class="fc" id="L59">                    this.left = new BinarySearchTree&lt;&gt;(this.comparator);</span>
+                }
+<span class="fc" id="L61">                this.left.insert(value);</span>
+
+            } else {
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">                if (this.right == null) {</span>
+<span class="fc" id="L65">                    this.right = new BinarySearchTree&lt;&gt;(this.comparator);</span>
+                }
+<span class="fc" id="L67">                this.right.insert(value);</span>
+            }
+        }
+<span class="fc" id="L70">    }</span>
+
+    @Override
+    public boolean isLeaf() {
+<span class="pc bpc" id="L74" title="1 of 6 branches missed.">        return this.left == null &amp;&amp; this.right == null &amp;&amp; this.value != null;</span>
+    }
+
+    @Override
+    public boolean contains(T value) {
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        if(value == null){</span>
+<span class="fc" id="L80">            throw new BinarySearchTreeException(&quot;El valor no puede ser nulo.&quot;);</span>
+        }
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (this.value == null) {</span>
+<span class="fc" id="L83">            return false;</span>
+        }
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        else if (this.value.equals(value)) {</span>
+<span class="fc" id="L86">            return true;</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        } else if (comparator.compare(value, this.value) &lt; 0) {</span>
+<span class="pc bpc" id="L88" title="2 of 4 branches missed.">            return this.left != null &amp;&amp; this.left.contains(value);</span>
+        } else {
+<span class="pc bpc" id="L90" title="1 of 4 branches missed.">            return this.right != null &amp;&amp; this.right.contains(value);</span>
+        }
+    }
+
+    @Override
+    public T minimum() {
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        if(this.left == null){</span>
+<span class="fc" id="L97">            return this.value;</span>
+        } else {
+<span class="fc" id="L99">            return this.left.minimum();</span>
+        }
+    }
+
+    @Override
+    public T maximum() {
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        if (this.right == null){</span>
+<span class="fc" id="L106">            return this.value;</span>
+        } else {
+<span class="fc" id="L108">            return this.right.maximum();</span>
+        }
+    }
+
+    @Override
+    public void removeBranch(T value){ // no hay que comprobar si el valor es nulo ya que ya lo hace el contains
+<span class="fc bfc" id="L114" title="All 2 branches covered.">        if (value == null){</span>
+<span class="fc" id="L115">            throw new BinarySearchTreeException(&quot;El valor no puede ser nulo.&quot;);</span>
+        }
+<span class="fc bfc" id="L117" title="All 2 branches covered.">        if  (!this.contains(value)){</span>
+<span class="fc" id="L118">            throw new BinarySearchTreeException(&quot;El valor no se encuentra en el árbol&quot;);</span>
+        }
+<span class="fc" id="L120">        removeBranchRecursive(value,false,null);</span>
+
+<span class="fc" id="L122">    }</span>
+
+    private void removeBranchRecursive(T value,boolean left,BinarySearchTree&lt;T&gt; parent){
+<span class="pc bpc" id="L125" title="1 of 4 branches missed.">        if (this.left != null &amp;&amp; comparator.compare(value, this.value) &lt; 0){</span>
+<span class="fc" id="L126">            this.left.removeBranchRecursive(value,true,this);</span>
+<span class="pc bpc" id="L127" title="3 of 4 branches missed.">        } else if(this.right != null &amp;&amp; comparator.compare(value, this.value) &gt; 0){</span>
+<span class="nc" id="L128">            this.right.removeBranchRecursive(value,false,this);</span>
+        } else {
+<span class="fc" id="L130">            this.delete(left,parent); // hay que borrar el arbol hasta abajo</span>
+        }
+<span class="fc" id="L132">    }</span>
+
+    private void delete(boolean left,BinarySearchTree&lt;T&gt; parent){
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">        if(this.left != null){</span>
+<span class="nc" id="L136">            this.left.delete(true,this);</span>
+        }
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        if(this.right != null){</span>
+<span class="nc" id="L139">            this.right.delete(false,this);</span>
+        }
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">        if (parent != null) { // Si no es la raíz</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">            if (left) { // Si es el hijo izquierdo se va a tener que eliminar desde el padre</span>
+<span class="fc" id="L143">                parent.left = null;</span>
+            } else {
+<span class="nc" id="L145">                parent.right = null;</span>
+            }
+        }
+<span class="fc" id="L148">        this.value = null;</span>
+<span class="fc" id="L149">        this.left = null;</span>
+<span class="fc" id="L150">        this.right = null;</span>
+<span class="fc" id="L151">    }</span>
+
+    @Override
+    public int size() {
+<span class="fc bfc" id="L155" title="All 2 branches covered.">        if(value == null){</span>
+<span class="fc" id="L156">            return 0;</span>
+        }
+<span class="fc" id="L158">        int n = 1;</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">        if (this.left != null) {</span>
+<span class="fc" id="L160">            n += this.left.size();</span>
+        }
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        if (this.right != null) {</span>
+<span class="fc" id="L163">            n += this.right.size();</span>
+        }
+<span class="fc" id="L165">        return n;</span>
+    }
+
+    @Override
+    public int depth() {
+<span class="fc bfc" id="L170" title="All 2 branches covered.">        if(value == null){</span>
+<span class="fc" id="L171">            return 0;</span>
+        }
+<span class="fc" id="L173">        int leftDepth = 0, rightDepth = 0;</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        if (this.left != null) {</span>
+<span class="fc" id="L175">            leftDepth = this.left.depth();</span>
+        }
+<span class="fc bfc" id="L177" title="All 2 branches covered.">        if (this.right != null) {</span>
+<span class="fc" id="L178">            rightDepth = this.right.depth();</span>
+        }
+<span class="fc" id="L180">        return 1 + Integer.max(leftDepth, rightDepth);</span>
+    }
+
+    // Complex operations
+    // (Estas operaciones se incluirán más adelante para ser realizadas en la segunda
+    // sesión de laboratorio de esta práctica)
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
