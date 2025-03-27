@@ -22,6 +22,89 @@ class BinarySearchTreeTest {
     }
 
     @Test
+    @DisplayName("Árbol recién creado debe estar vacío")
+    void render_arbolVacio_devuelveCadenaVacia() {
+        // Act
+        String resultado = arbolEnteros.render();
+
+        // Assert
+        assertEquals("", resultado);
+    }
+
+    @Test
+    @DisplayName("Árbol con un solo elemento")
+    void render_unElemento_devuelveElemento() {
+        // Arrange
+        arbolEnteros.insert(5);
+
+        // Act
+        String resultado = arbolEnteros.render();
+
+        // Assert
+        assertEquals("5", resultado);
+    }
+
+    @Test
+    @DisplayName("Árbol con elemento solo a la izquierda")
+    void render_elementoIzquierda_muestraParentesisCorrectamente() {
+        // Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+
+        // Act
+        String resultado = arbolEnteros.render();
+
+        // Assert
+        assertEquals("5(3,)", resultado);
+    }
+
+    @Test
+    @DisplayName("Árbol con elemento solo a la derecha")
+    void render_elementoDerecha_muestraParentesisCorrectamente() {
+        // Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(7);
+
+        // Act
+        String resultado = arbolEnteros.render();
+
+        // Assert
+        assertEquals("5(,7)", resultado);
+    }
+
+    @Test
+    @DisplayName("Árbol con elementos en ambos lados")
+    void render_elementosAmbosLados_muestraEstructuraCompleta() {
+        // Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(7);
+
+        // Act
+        String resultado = arbolEnteros.render();
+
+        // Assert
+        assertEquals("5(3,7)", resultado);
+    }
+
+    @Test
+    @DisplayName("Árbol con múltiples niveles")
+    void render_multiplesNiveles_muestraEstructuraAnidada() {
+        // Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(7);
+        arbolEnteros.insert(2);
+        arbolEnteros.insert(8);
+
+        // Act
+        String resultado = arbolEnteros.render();
+
+        // Assert
+        assertEquals("5(3(2,),7(,8))", resultado);
+    }
+
+    @Test
     @DisplayName("Crear árbol con comparador nulo debe lanzar excepción")
     void crearArbolConComparadorNulo_DaExcepcion() {
         // Act & Assert
@@ -84,7 +167,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Buscar elemento en árbol vacío debe devolver falso")
-    void buscar_ArbolVacio_daFalso() {
+    void contains_ArbolVacio_daFalso() {
         // Act
         boolean containsResult = arbolEnteros.contains(5);
 
@@ -94,7 +177,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Buscar elemento existente debe devolver verdadero")
-    void buscar_ElementoExistente_daTrue() {
+    void contains_ElementoExistente_daTrue() {
         // Arrange
         arbolEnteros.insert(5);
         arbolEnteros.insert(3);
@@ -108,7 +191,7 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Buscar elemento no existente debe devolver falso")
-    void buscar_ElementoNoExistente_daFalse() {
+    void contains_ElementoNoExistente_daFalse() {
         // Arrange
         arbolEnteros.insert(5);
         arbolEnteros.insert(3);
@@ -122,11 +205,100 @@ class BinarySearchTreeTest {
 
     @Test
     @DisplayName("Buscar con valor nulo debe lanzar excepción")
-    void buscar_ValorNulo_daExcepcion() {
+    void contains_ValorNulo_daExcepcion() {
         // Act & Assert
         assertThrows(BinarySearchTreeException.class, () -> {
             arbolEnteros.contains(null);
         });
+    }
+
+    @Test
+    @DisplayName("Buscar elemento nulo en árbol con elementos")
+    void contains_valorNuloArbolConElementos_lanzaExcepcion() {
+        // Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+
+        // Act & Assert
+        assertThrows(BinarySearchTreeException.class, () -> {
+            arbolEnteros.contains(null);
+        });
+    }
+
+    @Test
+    @DisplayName("Buscar en subárbol izquierdo profundo")
+    void contains_elementoEnSubarbolIzquierdo_devuelveVerdadero() {
+        // Arrange
+        arbolEnteros.insert(10);
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(1);
+
+        // Act
+        boolean resultado = arbolEnteros.contains(1);
+
+        // Assert
+        assertTrue(resultado);
+    }
+
+    @Test
+    @DisplayName("Buscar en subárbol derecho profundo")
+    void contains_elementoEnSubarbolDerecho_devuelveVerdadero() {
+        // Arrange
+        arbolEnteros.insert(10);
+        arbolEnteros.insert(15);
+        arbolEnteros.insert(20);
+        arbolEnteros.insert(25);
+
+        // Act
+        boolean resultado = arbolEnteros.contains(25);
+
+        // Assert
+        assertTrue(resultado);
+    }
+
+    @Test
+    @DisplayName("Buscar elemento duplicado")
+    void contains_elementoDuplicado_devuelveVerdadero() {
+        // Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(5);
+
+        // Act
+        boolean resultado = arbolEnteros.contains(5);
+
+        // Assert
+        assertTrue(resultado);
+    }
+
+    @Test
+    @DisplayName("Buscar elemento menor que todos")
+    void contains_elementoMenorQueTodos_devuelveFalso() {
+        // Arrange
+        arbolEnteros.insert(10);
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(15);
+
+        // Act
+        boolean resultado = arbolEnteros.contains(1);
+
+        // Assert
+        assertFalse(resultado);
+    }
+
+    @Test
+    @DisplayName("Buscar elemento mayor que todos")
+    void contains_elementoMayorQueTodos_devuelveFalso() {
+        // Arrange
+        arbolEnteros.insert(10);
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(15);
+
+        // Act
+        boolean resultado = arbolEnteros.contains(20);
+
+        // Assert
+        assertFalse(resultado);
     }
 
     @Test
@@ -150,6 +322,32 @@ class BinarySearchTreeTest {
 
         // Assert
         assertTrue(isLeaf);
+    }
+    @Test
+    @DisplayName("Arbol con elemento a la izquierda no es hoja")
+    public void isLeaf_arbolIzquierda_daFalse() {
+        //Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+
+        //Act
+        boolean isLeaf = arbolEnteros.isLeaf();
+
+        //Assert
+        assertFalse(isLeaf);
+    }
+
+    @Test
+    @DisplayName("Arbol con elemento a la derecha no es hoja")
+    public void isLeaf_arbolDerecha_daFalse() {
+        //Arrange
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(7);
+        //Act
+        boolean isLeaf = arbolEnteros.isLeaf();
+        //Assert
+        assertFalse(isLeaf);
+
     }
 
     @Test
@@ -251,6 +449,98 @@ class BinarySearchTreeTest {
         assertThrows(BinarySearchTreeException.class, () -> {
             arbolEnteros.removeBranch(10);
         });
+    }
+
+    @Test
+    @DisplayName("Eliminar raíz de árbol con un solo elemento")
+    void removeBranch_raizUnica_dejaArbolVacio() {
+        // Arrange
+        arbolEnteros.insert(5);
+
+        // Act
+        arbolEnteros.removeBranch(5);
+
+        // Assert
+        assertEquals("", arbolEnteros.render());
+    }
+
+    @Test
+    @DisplayName("Eliminar nodo hoja izquierdo")
+    void removeBranch_nodoHojaIzquierdo_eliminaCorrectamente() {
+        // Arrange
+        arbolEnteros.insert(10);
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(15);
+
+        // Act
+        arbolEnteros.removeBranch(5);
+
+        // Assert
+        assertEquals("10(,15)", arbolEnteros.render());
+    }
+
+    @Test
+    @DisplayName("Eliminar nodo hoja derecho")
+    void removeBranch_nodoHojaDerecho_eliminaCorrectamente() {
+        // Arrange
+        arbolEnteros.insert(10);
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(15);
+
+        // Act
+        arbolEnteros.removeBranch(15);
+
+        // Assert
+        assertEquals("10(5,)", arbolEnteros.render());
+    }
+
+    @Test
+    @DisplayName("Eliminar subárbol con múltiples niveles")
+    void removeBranch_subarbolMultinivel_eliminaTodaLaRama() {
+        // Arrange
+        arbolEnteros.insert(10);
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(15);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(7);
+
+        // Act
+        arbolEnteros.removeBranch(5);
+
+        // Assert
+        assertEquals("10(,15)", arbolEnteros.render());
+    }
+
+    @Test
+    @DisplayName("Eliminar raíz de árbol complejo")
+    void removeBranch_raizArbolComplejo_eliminaTodo() {
+        // Arrange
+        arbolEnteros.insert(10);
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(15);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(7);
+
+        // Act
+        arbolEnteros.removeBranch(10);
+
+        // Assert
+        assertEquals("", arbolEnteros.render());
+    }
+
+    @Test
+    @DisplayName("Eliminar nodo con valores duplicados")
+    void removeBranch_nodoDuplicado_eliminaCorrectamente() {
+        // Arrange
+        arbolEnteros.insert(10);
+        arbolEnteros.insert(10);
+        arbolEnteros.insert(5);
+
+        // Act
+        arbolEnteros.removeBranch(10);
+
+        // Assert
+        assertEquals("", arbolEnteros.render());
     }
 
     @Test
