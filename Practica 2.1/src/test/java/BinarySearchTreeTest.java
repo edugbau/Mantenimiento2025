@@ -662,4 +662,279 @@ class BinarySearchTreeTest {
         //Assert
         assertEquals(List.of(3,4,5), lista);
     }
+
+    @Test
+    @DisplayName("inOrder con múltiples elementos en un árbol balanceado")
+    public void inOrder_arbolBalanceadoMultiplesElementos_devuelveEnOrden() {
+        // Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(7);
+        arbolEnteros.insert(2);
+        arbolEnteros.insert(4);
+        arbolEnteros.insert(6);
+        arbolEnteros.insert(8);
+
+        // Act
+        List<Integer> lista = arbolEnteros.inOrder();
+
+        // Assert
+        assertEquals(List.of(2, 3, 4, 5, 6, 7, 8), lista);
+    }
+
+    @Test
+    @DisplayName("inOrder con elementos duplicados los incluye en el orden correcto")
+    public void inOrder_elementosDuplicados_incluyeTodosElementos() {
+        // Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(5); // Duplicado
+        arbolEnteros.insert(7);
+
+        // Act
+        List<Integer> lista = arbolEnteros.inOrder();
+
+        // Assert
+        assertEquals(List.of(3, 5, 5, 7), lista);
+    }
+    @Test
+    @DisplayName("removeValue en árbol vacío lanza excepción")
+    void removeValue_arbolVacio_lanzaExcepcion() {
+        // Act & Assert
+        assertThrows(BinarySearchTreeException.class, () -> {
+            arbolEnteros.removeValue(5);
+        });
+    }
+
+    @Test
+    @DisplayName("removeValue con valor nulo lanza excepción")
+    void removeValue_valorNulo_lanzaExcepcion() {
+        // Arrange
+        arbolEnteros.insert(5);
+
+        // Act & Assert
+        assertThrows(BinarySearchTreeException.class, () -> {
+            arbolEnteros.removeValue(null);
+        });
+    }
+
+    @Test
+    @DisplayName("removeValue con valor no existente lanza excepción")
+    void removeValue_valorNoExistente_lanzaExcepcion() {
+        // Arrange
+        arbolEnteros.insert(5);
+
+        // Act & Assert
+        assertThrows(BinarySearchTreeException.class, () -> {
+            arbolEnteros.removeValue(10);
+        });
+    }
+
+    @Test
+    @DisplayName("removeValue de único elemento deja árbol vacío")
+    void removeValue_unicoElemento_dejaArbolVacio() {
+        // Arrange
+        arbolEnteros.insert(5);
+
+        // Act
+        arbolEnteros.removeValue(5);
+
+        // Assert
+        assertEquals("", arbolEnteros.render());
+        assertEquals(0, arbolEnteros.size());
+    }
+
+    @Test
+    @DisplayName("removeValue de raíz en árbol con múltiples elementos conserva estructura")
+    void removeValue_raizArbolMultiple_conservaEstructura() {
+        // Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(7);
+        arbolEnteros.insert(2);
+        arbolEnteros.insert(4);
+
+        // Act
+        arbolEnteros.removeValue(5);
+
+        // Assert
+        assertFalse(arbolEnteros.contains(5));
+        assertTrue(arbolEnteros.contains(3));
+        assertTrue(arbolEnteros.contains(7));
+        assertTrue(arbolEnteros.contains(2));
+        assertTrue(arbolEnteros.contains(4));
+        assertEquals(4, arbolEnteros.size());
+    }
+
+    @Test
+    @DisplayName("removeValue de hoja en árbol múltiple")
+    void removeValue_hojaArbolMultiple_eliminaSoloHoja() {
+        // Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(7);
+
+        // Act
+        arbolEnteros.removeValue(3);
+
+        // Assert
+        assertTrue(arbolEnteros.contains(5));
+        assertFalse(arbolEnteros.contains(3));
+        assertTrue(arbolEnteros.contains(7));
+        assertEquals(2, arbolEnteros.size());
+    }
+
+    @Test
+    @DisplayName("removeValue de elemento con hijos conserva estructura correcta")
+    void removeValue_elementoConHijos_conservaEstructura() {
+        // Arrange
+        arbolEnteros.insert(10);
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(15);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(7);
+
+        // Act
+        arbolEnteros.removeValue(5);
+
+        // Assert
+        assertTrue(arbolEnteros.contains(10));
+        assertFalse(arbolEnteros.contains(5));
+        assertTrue(arbolEnteros.contains(15));
+        assertTrue(arbolEnteros.contains(3));
+        assertTrue(arbolEnteros.contains(7));
+        assertEquals(4, arbolEnteros.size());
+    }
+
+    @Test
+    @DisplayName("removeValue de valor duplicado elimina solo una instancia")
+    void removeValue_valorDuplicado_eliminaSoloUnaInstancia() {
+        // Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+
+        // Act
+        arbolEnteros.removeValue(5);
+
+        // Assert
+        assertTrue(arbolEnteros.contains(5)); // Todavía debe contener una instancia de 5
+        assertTrue(arbolEnteros.contains(3));
+        assertEquals(2, arbolEnteros.size());
+    }
+
+    @Test
+    @DisplayName("balance en árbol vacío no hace nada")
+    void balance_arbolVacio_noHaceNada() {
+        // Act
+        arbolEnteros.balance();
+
+        // Assert
+        assertEquals("", arbolEnteros.render());
+        assertEquals(0, arbolEnteros.size());
+    }
+
+    @Test
+    @DisplayName("balance en árbol con un solo elemento no cambia nada")
+    void balance_arbolUnElemento_noCambia() {
+        // Arrange
+        arbolEnteros.insert(5);
+
+        // Act
+        arbolEnteros.balance();
+
+        // Assert
+        assertEquals("5", arbolEnteros.render());
+        assertEquals(1, arbolEnteros.size());
+    }
+
+    @Test
+    @DisplayName("balance en árbol ya balanceado mantiene estructura")
+    void balance_arbolYaBalanceado_mantieneEstructura() {
+        // Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(7);
+
+        String renderAntes = arbolEnteros.render();
+        List<Integer> elementosAntes = arbolEnteros.inOrder();
+
+        // Act
+        arbolEnteros.balance();
+
+        // Assert
+        List<Integer> elementosDespues = arbolEnteros.inOrder();
+        assertEquals(elementosAntes, elementosDespues);
+        // No comprobamos el render exacto porque podría cambiar la estructura aún manteniéndose balanceado
+    }
+
+    @Test
+    @DisplayName("balance en árbol desequilibrado redistribuye elementos")
+    void balance_arbolDesequilibrado_redistribuyeElementos() {
+        // Arrange - Crear un árbol desequilibrado (solo hacia la derecha)
+        arbolEnteros.insert(1);
+        arbolEnteros.insert(2);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(4);
+        arbolEnteros.insert(5);
+
+        int profundidadAntes = arbolEnteros.depth();
+        List<Integer> elementosAntes = arbolEnteros.inOrder();
+
+        // Act
+        arbolEnteros.balance();
+
+        // Assert
+        List<Integer> elementosDespues = arbolEnteros.inOrder();
+        assertEquals(elementosAntes, elementosDespues); // Mismos elementos
+        int profundidadDespues = arbolEnteros.depth();
+        assertTrue(profundidadDespues < profundidadAntes); // Debería reducirse la profundidad
+    }
+
+    @Test
+    @DisplayName("balance conserva todos los elementos del árbol")
+    void balance_conservaTodosElementos() {
+        // Arrange
+        arbolEnteros.insert(10);
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(15);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(7);
+        arbolEnteros.insert(12);
+        arbolEnteros.insert(20);
+
+        int sizeAntes = arbolEnteros.size();
+        List<Integer> elementosAntes = arbolEnteros.inOrder();
+
+        // Act
+        arbolEnteros.balance();
+
+        // Assert
+        int sizeDespues = arbolEnteros.size();
+        List<Integer> elementosDespues = arbolEnteros.inOrder();
+
+        assertEquals(sizeAntes, sizeDespues);
+        assertEquals(elementosAntes, elementosDespues);
+    }
+
+    @Test
+    @DisplayName("balance en árbol con elementos duplicados los mantiene")
+    void balance_elementosDuplicados_losMantiene() {
+        // Arrange
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(5);
+        arbolEnteros.insert(3);
+        arbolEnteros.insert(7);
+
+        List<Integer> elementosAntes = arbolEnteros.inOrder();
+
+        // Act
+        arbolEnteros.balance();
+
+        // Assert
+        List<Integer> elementosDespues = arbolEnteros.inOrder();
+        assertEquals(elementosAntes, elementosDespues);
+        assertEquals(4, arbolEnteros.size());
+    }
+
 }

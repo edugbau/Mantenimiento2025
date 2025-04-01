@@ -190,7 +190,7 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
         }
         return 1 + Integer.max(leftDepth, rightDepth);
     }
-
+/*
     @Override
     public void removeValue(T value) {
         if(!this.contains(value)){ // no hay que comprobar que value sea null porque lo hace le contains
@@ -264,8 +264,25 @@ public class BinarySearchTree<T> implements BinarySearchTreeStructure<T> {
             this.right = null;
         }
     }
+*/
+@Override
+public void removeValue(T value) {
+    if (!this.contains(value)) {
+        throw new BinarySearchTreeException("El valor no se encuentra en el árbol");
+    }
 
+    List<T> values = this.inOrder();
+    values.remove(value);
 
+    // El recolector de basura de java elimina los nodos inaccesibles
+    this.value = null;
+    this.right = null;
+    this.left = null;
+
+    // que values sea empty se maneja en balanceRecursive
+    balanceRecursive(values, this);
+
+}
     @Override
     public List<T> inOrder() {
         List<T> res = new ArrayList<>();
