@@ -25,18 +25,18 @@ import org.mps.dispositivo.Dispositivo;
     public abstract void obtenerNuevaLectura();
 
     public void anyadirDispositivo(Dispositivo d){
-<span class="nc" id="L28">        disp = d;</span>
-<span class="nc" id="L29">    }</span>
+<span class="fc" id="L28">        disp = d;</span>
+<span class="fc" id="L29">    }</span>
 
     /* 
      * Reconecta el dispositivo cuando esta desconectado.
     */
     public boolean reconectar(){
-<span class="nc" id="L35">        boolean result = false;</span>
-<span class="nc bnc" id="L36" title="All 2 branches missed.">        if (!disp.estaConectado()){</span>
-<span class="nc bnc" id="L37" title="All 4 branches missed.">            result = disp.conectarSensorPresion() &amp;&amp; disp.conectarSensorSonido();</span>
+<span class="fc" id="L35">        boolean result = false;</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        if (!disp.estaConectado()){</span>
+<span class="fc bfc" id="L37" title="All 4 branches covered.">            result = disp.conectarSensorPresion() &amp;&amp; disp.conectarSensorSonido();</span>
         }
-<span class="nc" id="L39">        return result;</span>
+<span class="fc" id="L39">        return result;</span>
     }
 
     /* 
@@ -48,7 +48,7 @@ import org.mps.dispositivo.Dispositivo;
      * Lee y almacena las lecturas de presion y sonido del dispositivo.
     */
     public boolean estaConectado(){
-<span class="nc" id="L51">        return disp.estaConectado();</span>
+<span class="fc" id="L51">        return disp.estaConectado();</span>
     }    
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

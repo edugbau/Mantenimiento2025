@@ -31,7 +31,6 @@ public class ronQI2SilverTest {
         //Act y Assert
         assertThrows(NullPointerException.class, () -> aparato.inicializar());
     }
-    @DisplayName("Inicializar con falso en concectarSensorPresion da falso")
     @Test
     public void inicializar_sensorPresionFalso_daFalso(){
         //Arrange
@@ -41,9 +40,12 @@ public class ronQI2SilverTest {
         boolean res = aparato.inicializar();
         //Assert
         assertFalse(res);
+        verify(aparato.disp, times(1)).conectarSensorPresion();
+        verify(aparato.disp, never()).conectarSensorSonido();
+        verify(aparato.disp, never()).configurarSensorPresion();
+        verify(aparato.disp, never()).configurarSensorSonido();
     }
 
-    @DisplayName("Inicializar con verdadero en concectarSensorPresion y falso en sonido da falso")
     @Test
     public void inicializar_sensorSonidoFalso_daFalso(){
         //Arrange
@@ -54,23 +56,12 @@ public class ronQI2SilverTest {
         boolean res = aparato.inicializar();
         //Assert
         assertFalse(res);
-    }
-    @DisplayName("Inicializar con todos los sensores conectados y configurados da verdadero")
-    @Test
-    public void inicializar_todoCorrecto_daVerdadero(){
-        //Arrange
-        aparato.disp = mock(DispositivoSilver.class);
-        when(aparato.disp.conectarSensorPresion()).thenReturn(true);
-        when(aparato.disp.configurarSensorPresion()).thenReturn(true);
-        when(aparato.disp.conectarSensorSonido()).thenReturn(true);
-        when(aparato.disp.configurarSensorSonido()).thenReturn(true);
-        //Act
-        boolean res = aparato.inicializar();
-        //Assert
-        assertTrue(res);
+        verify(aparato.disp, times(1)).conectarSensorPresion();
+        verify(aparato.disp, times(1)).conectarSensorSonido();
+        verify(aparato.disp, times(1)).configurarSensorPresion();
+        verify(aparato.disp, never()).configurarSensorSonido();
     }
 
-    @DisplayName("Inicializar con fallo en configuración de presión da falso")
     @Test
     public void inicializar_configPresionFalso_daFalso(){
         //Arrange
@@ -83,9 +74,12 @@ public class ronQI2SilverTest {
         boolean res = aparato.inicializar();
         //Assert
         assertFalse(res);
+        verify(aparato.disp, times(1)).conectarSensorPresion();
+        verify(aparato.disp, times(1)).conectarSensorSonido();
+        verify(aparato.disp, times(1)).configurarSensorPresion();
+        verify(aparato.disp, times(1)).configurarSensorSonido();
     }
 
-    @DisplayName("Inicializar con fallo en configuración de sonido da falso")
     @Test
     public void inicializar_configSonidoFalso_daFalso(){
         //Arrange
@@ -98,9 +92,17 @@ public class ronQI2SilverTest {
         boolean res = aparato.inicializar();
         //Assert
         assertFalse(res);
+        verify(aparato.disp, times(1)).conectarSensorPresion();
+        verify(aparato.disp, times(1)).conectarSensorSonido();
+        verify(aparato.disp, times(1)).configurarSensorPresion();
+        verify(aparato.disp, times(1)).configurarSensorSonido();
     }
-
-    @DisplayName("Inicializar llama a los métodos de configuración y conexión una vez")
+    
+    /*
+     * Un inicializar debe configurar ambos sensores, comprueba que cuando se inicializa de forma correcta (el conectar es true), 
+     * se llama una sola vez al configurar de cada sensor.
+     */
+    @DisplayName("Inicializar llama a los métodos de configuración una vez")
     @Test
     public void inicializar_llamaConfiguracionUnaVez(){
         //Arrange
@@ -110,24 +112,141 @@ public class ronQI2SilverTest {
         when(aparato.disp.conectarSensorSonido()).thenReturn(true);
         when(aparato.disp.configurarSensorSonido()).thenReturn(true);
         //Act
-        aparato.inicializar();
+        boolean res = aparato.inicializar();
         //Assert
+        assertTrue(res);
         verify(aparato.disp, times(1)).configurarSensorPresion();
         verify(aparato.disp, times(1)).configurarSensorSonido();
         verify(aparato.disp, times(1)).conectarSensorPresion();
         verify(aparato.disp, times(1)).conectarSensorSonido();
     }
-    
-    /*
-     * Un inicializar debe configurar ambos sensores, comprueba que cuando se inicializa de forma correcta (el conectar es true), 
-     * se llama una sola vez al configurar de cada sensor.
-     */
 
     /*
      * Un reconectar, comprueba si el dispositivo desconectado, en ese caso, conecta ambos y devuelve true si ambos han sido conectados. 
      * Genera las pruebas que estimes oportunas para comprobar su correcto funcionamiento. 
      * Centrate en probar si todo va bien, o si no, y si se llama a los métodos que deben ser llamados.
      */
+    @DisplayName("Si el dispositivo está conectado, devuelve false")
+    @Test
+    public void reconectar_DispositivoConectado_daFalse(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.estaConectado()).thenReturn(true);
+        //Act
+        boolean res = aparato.reconectar();
+        //Assert
+        assertFalse(res);
+        verify(aparato.disp, times(1)).estaConectado();
+        verify(aparato.disp, never()).conectarSensorPresion();
+        verify(aparato.disp, never()).conectarSensorSonido();
+    }
+    @DisplayName("Si el dispositivo está desconectado y ambos sensores se conectan, devuelve true")
+    @Test
+    public void reconectar_DispositivoDesconectadoYSensoresConectan_daTrue(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.estaConectado()).thenReturn(false);
+        when(aparato.disp.conectarSensorPresion()).thenReturn(true);
+        when(aparato.disp.conectarSensorSonido()).thenReturn(true);
+        //Act
+        boolean res = aparato.reconectar();
+        //Assert
+        assertTrue(res);
+        verify(aparato.disp, times(1)).estaConectado();
+        verify(aparato.disp, times(1)).conectarSensorPresion();
+        verify(aparato.disp, times(1)).conectarSensorSonido();
+    }
+
+    @DisplayName("Si el dispositivo está desconectado y falla conectar presión, devuelve false")
+    @Test
+    public void reconectar_DispositivoDesconectadoYFallaPresion_daFalse(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.estaConectado()).thenReturn(false);
+        when(aparato.disp.conectarSensorPresion()).thenReturn(false);
+        //Act
+        boolean res = aparato.reconectar();
+        //Assert
+        assertFalse(res);
+        verify(aparato.disp, times(1)).estaConectado();
+        verify(aparato.disp, times(1)).conectarSensorPresion();
+        verify(aparato.disp, never()).conectarSensorSonido();
+    }
+
+    @DisplayName("Si el dispositivo está desconectado y falla conectar sonido, devuelve false")
+    @Test
+    public void reconectar_DispositivoDesconectadoYFallaSonido_daFalse(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.estaConectado()).thenReturn(false);
+        when(aparato.disp.conectarSensorPresion()).thenReturn(true);
+        when(aparato.disp.conectarSensorSonido()).thenReturn(false);
+        //Act
+        boolean res = aparato.reconectar();
+        //Assert
+        assertFalse(res);
+        verify(aparato.disp, times(1)).estaConectado();
+        verify(aparato.disp, times(1)).conectarSensorPresion();
+        verify(aparato.disp, times(1)).conectarSensorSonido();
+    }
+
+
+
+    @DisplayName("Cuando el dispositivo está conectado, estaConectado devuelve true")
+    @Test
+    public void estaConectado_DispositivoConectado_daTrue() {
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.estaConectado()).thenReturn(true);
+        //Act
+        boolean res = aparato.estaConectado();
+        //Assert
+        assertTrue(res);
+        verify(aparato.disp, times(1)).estaConectado();
+    }
+
+    @DisplayName("Cuando el dispositivo está desconectado, estaConectado devuelve false")
+    @Test
+    public void estaConectado_DispositivoDesconectado_daFalse() {
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.estaConectado()).thenReturn(false);
+        //Act
+        boolean res = aparato.estaConectado();
+        //Assert
+        assertFalse(res);
+        verify(aparato.disp, times(1)).estaConectado();
+    }
+
+    @DisplayName("Cuando el dispositivo es nulo, estaConectado lanza NullPointerException")
+    @Test
+    public void estaConectado_DispositivoNulo_daExcepcion() {
+        //Arrange
+        aparato.disp = null;
+        //Act y Assert
+        assertThrows(NullPointerException.class, () -> aparato.estaConectado());
+    }
+
+    @DisplayName("Añadir dispositivo asigna correctamente el dispositivo")
+    @Test
+    public void anyadirDispositivo_DispositivoValido_AsignaDispositivo() {
+        //Arrange
+        DispositivoSilver dispositivo = mock(DispositivoSilver.class);
+        //Act
+        aparato.anyadirDispositivo(dispositivo);
+        //Assert
+        assertSame(dispositivo, aparato.disp);
+    }
+
+    @DisplayName("Añadir dispositivo nulo permite la asignación")
+    @Test
+    public void anyadirDispositivo_DispositivoNulo_AsignaNulo() {
+        //Arrange y Act
+        aparato.anyadirDispositivo(null);
+        //Assert
+        assertNull(aparato.disp);
+    }
+
     
     /*
      * El método evaluarApneaSuenyo, evalua las últimas 5 lecturas realizadas con obtenerNuevaLectura(), 
