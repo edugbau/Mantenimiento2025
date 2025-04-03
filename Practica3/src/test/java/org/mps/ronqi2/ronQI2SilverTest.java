@@ -139,4 +139,143 @@ public class ronQI2SilverTest {
      * Usa el ParameterizedTest para realizar un número de lecturas previas a calcular si hay apnea o no (por ejemplo 4, 5 y 10 lecturas).
      * https://junit.org/junit5/docs/current/user-guide/index.html#writing-tests-parameterized-tests
      */
+
+    @DisplayName("Obtener una nueva lectura añade las lecturas a los arrays correspondientes")
+    @Test
+    public void obtenerNuevaLectura_anyadeLecturas(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.leerSensorPresion()).thenReturn(15.0f);
+        when(aparato.disp.leerSensorSonido()).thenReturn(20.0f);
+        //Act
+        aparato.obtenerNuevaLectura();
+        //Assert
+        verify(aparato.disp, times(1)).leerSensorPresion();;
+        verify(aparato.disp, times(1)).leerSensorSonido();
+    }
+
+    @DisplayName("Si añades varias lecturas se añaden a los arrays")
+    @Test
+    public void obtenerNuevaLectura_anyadeVariasLecturas() {
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.leerSensorPresion()).thenReturn(15.0f);
+        when(aparato.disp.leerSensorSonido()).thenReturn(20.0f);
+        //Act
+        aparato.obtenerNuevaLectura();
+        aparato.obtenerNuevaLectura();
+        aparato.obtenerNuevaLectura();
+        //Assert
+        verify(aparato.disp, times(3)).leerSensorPresion();
+        verify(aparato.disp, times(3)).leerSensorSonido();
+    }
+
+    @DisplayName("Si añades una nueva lectura se añade el valor correctamente y no sobrepasa el umbral")
+    @Test
+    public void evaluarApneaSuenyo_anayadeValorCorrecto_NoSobrepasaElUmbral(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.leerSensorPresion()).thenReturn(15.0f);
+        when(aparato.disp.leerSensorSonido()).thenReturn(20.0f);
+        aparato.obtenerNuevaLectura();
+        boolean pasaElUmbral = false;
+
+        //Act
+        pasaElUmbral = aparato.evaluarApneaSuenyo();
+
+        // Assert
+        assertFalse(pasaElUmbral);
+    }
+
+    @DisplayName("Si añades una varias lecturas se añaden los valores correctamente y no sobrepasa el umbral")
+    @Test
+    public void evaluarApneaSuenyo_anayadeValoresCorrectos_NoSobrepasaElUmbral(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.leerSensorPresion()).thenReturn(15.0f);
+        when(aparato.disp.leerSensorSonido()).thenReturn(20.0f);
+        aparato.obtenerNuevaLectura();
+        aparato.obtenerNuevaLectura();
+        aparato.obtenerNuevaLectura();
+        boolean pasaElUmbral = false;
+
+        //Act
+        pasaElUmbral = aparato.evaluarApneaSuenyo();
+
+        // Assert
+        assertFalse(pasaElUmbral);
+    }
+
+    @DisplayName("Si añades lecturas que sobrepasan el umbral, evaluarApneaSuenyo devuelve false")
+    @Test
+    public void evaluarApneaSuenyo_anayadeValoresSobreUmbral_SobrepasaElUmbral(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.leerSensorPresion()).thenReturn(25.0f);
+        when(aparato.disp.leerSensorSonido()).thenReturn(35.0f);
+        aparato.obtenerNuevaLectura();
+        boolean pasaElUmbral = false;
+
+        //Act
+        pasaElUmbral = aparato.evaluarApneaSuenyo();
+
+        // Assert
+        assertTrue(pasaElUmbral);
+    }
+
+    @DisplayName("Si añades mas de 5 lecturas, borra las primeras")
+    @Test
+    public void evaluarApneaSuenyo_anyadeMasDe5Lecturas_eliminaLasPrimeras(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.leerSensorPresion()).thenReturn(100.0f);
+        when(aparato.disp.leerSensorSonido()).thenReturn(100.0f);
+        aparato.obtenerNuevaLectura();
+        when(aparato.disp.leerSensorPresion()).thenReturn(15.0f);
+        when(aparato.disp.leerSensorSonido()).thenReturn(20.0f);
+        aparato.obtenerNuevaLectura();
+        aparato.obtenerNuevaLectura();
+        aparato.obtenerNuevaLectura();
+        aparato.obtenerNuevaLectura();
+        aparato.obtenerNuevaLectura();
+        boolean pasaElUmbral = false;
+
+        //Act
+        pasaElUmbral = aparato.evaluarApneaSuenyo();
+
+        // Assert
+        assertFalse(pasaElUmbral);
+    }
+    @DisplayName("Si añades un valor de presion que no sobrepasa y el sonido si no sobrepasa el umbral")
+    @Test
+    public void evaluarApneaSuenyo_anayadeValorPresionNoSobrepasaYSonidoSobrepasa_NoSobrepasaElUmbral(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.leerSensorPresion()).thenReturn(15.0f);
+        when(aparato.disp.leerSensorSonido()).thenReturn(100.0f);
+        aparato.obtenerNuevaLectura();
+        boolean pasaElUmbral = false;
+
+        //Act
+        pasaElUmbral = aparato.evaluarApneaSuenyo();
+
+        // Assert
+        assertFalse(pasaElUmbral);
+    }
+    @DisplayName("Si añades un valor de presion que sobrepasa y el sonido no no sobrepasa el umbral")
+    @Test
+    public void evaluarApneaSuenyo_anayadeValorPresionSobrepasaYSonidoNoSobrepasa_NoSobrepasaElUmbral(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.leerSensorPresion()).thenReturn(100.0f);
+        when(aparato.disp.leerSensorSonido()).thenReturn(20.0f);
+        aparato.obtenerNuevaLectura();
+        boolean pasaElUmbral = false;
+
+        //Act
+        pasaElUmbral = aparato.evaluarApneaSuenyo();
+
+        // Assert
+        assertFalse(pasaElUmbral);
+    }
 }
