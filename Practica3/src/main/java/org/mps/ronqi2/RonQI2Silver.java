@@ -27,7 +27,7 @@ public class RonQI2Silver extends RonQI2{
         if(lecturasP.size()>numLecturas){
             lecturasP.remove(0); 
         }
-        lecturasS.add(disp.leerSensorPresion());
+        lecturasS.add(disp.leerSensorPresion()); // TODO Debe leer el sonido no la presion
         if(lecturasS.size()>numLecturas){
             lecturasS.remove(0); 
         }
@@ -51,7 +51,7 @@ public class RonQI2Silver extends RonQI2{
                 .average()
                 .orElse(0.0);
         
-        if (avgP>=thresholdP && avgS > thresholdS){
+        if (avgP>=thresholdP && avgS > thresholdS){ // TODO este debe devolver true (según el comentario)
             resultado = false;
         }   
         else{
