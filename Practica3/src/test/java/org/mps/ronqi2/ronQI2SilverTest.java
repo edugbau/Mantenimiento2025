@@ -4,13 +4,12 @@ package org.mps.ronqi2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mps.dispositivo.Dispositivo;
 import org.mps.dispositivo.DispositivoSilver;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class ronQI2Silvertest {
+public class ronQI2SilverTest {
     RonQI2Silver aparato;
     
     /*
