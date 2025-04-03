@@ -52,6 +52,7 @@ public class RonQI2Silver extends RonQI2{
                 .orElse(0.0);
         
         if (avgP>=thresholdP && avgS > thresholdS){ // TODO este debe devolver true (según el comentario)
+            // TODO ademas debe ser >thresholdP y no >=thresholdP
             resultado = false;
         }   
         else{
