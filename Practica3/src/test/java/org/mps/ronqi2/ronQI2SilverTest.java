@@ -365,7 +365,7 @@ public class ronQI2SilverTest {
         // Assert
         assertFalse(pasaElUmbral);
     }
-    @DisplayName("Si añades un valor de presion que no sobrepasa y el sonido si no sobrepasa el umbral")
+    @DisplayName("Si añades un valor de presion que no sobrepasa y el sonido si, no sobrepasa el umbral")
     @Test
     public void evaluarApneaSuenyo_anayadeValorPresionNoSobrepasaYSonidoSobrepasa_NoSobrepasaElUmbral(){
         //Arrange
@@ -381,13 +381,61 @@ public class ronQI2SilverTest {
         // Assert
         assertFalse(pasaElUmbral);
     }
-    @DisplayName("Si añades un valor de presion que sobrepasa y el sonido no no sobrepasa el umbral")
+    @DisplayName("Si añades un valor de presion que sobrepasa y el sonido no, no sobrepasa el umbral")
     @Test
     public void evaluarApneaSuenyo_anayadeValorPresionSobrepasaYSonidoNoSobrepasa_NoSobrepasaElUmbral(){
         //Arrange
         aparato.disp = mock(DispositivoSilver.class);
         when(aparato.disp.leerSensorPresion()).thenReturn(100.0f);
         when(aparato.disp.leerSensorSonido()).thenReturn(20.0f);
+        aparato.obtenerNuevaLectura();
+        boolean pasaElUmbral = false;
+
+        //Act
+        pasaElUmbral = aparato.evaluarApneaSuenyo();
+
+        // Assert
+        assertFalse(pasaElUmbral);
+    }
+    @DisplayName("Si añades un valor de presion y sonido que esta justo en el umbral no sobrepasa el umbral")
+    @Test
+    public void evaluarApneaSuenyo_anayadeValoresJustoEnElUmbral_NoSobrepasaElUmbral(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.leerSensorPresion()).thenReturn(20.0f);
+        when(aparato.disp.leerSensorSonido()).thenReturn(30.0f);
+        aparato.obtenerNuevaLectura();
+        boolean pasaElUmbral = false;
+
+        //Act
+        pasaElUmbral = aparato.evaluarApneaSuenyo();
+
+        // Assert
+        assertFalse(pasaElUmbral);
+    }
+    @DisplayName("Si añades un valor de presion que esta justo en el umbral el y sonido los sobrepasa, no sobrepasa el umbral")
+    @Test
+    public void evaluarApneaSuenyo_anayadePresionEnUmbralSonidoSobreUmbral_NoSobrepasaElUmbral(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.leerSensorPresion()).thenReturn(20.0f);
+        when(aparato.disp.leerSensorSonido()).thenReturn(100.0f);
+        aparato.obtenerNuevaLectura();
+        boolean pasaElUmbral = false;
+
+        //Act
+        pasaElUmbral = aparato.evaluarApneaSuenyo();
+
+        // Assert
+        assertFalse(pasaElUmbral);
+    }
+    @DisplayName("Si añades un valor de presion que sobrepasa el umbral y sonido justo en el, no sobrepasa el umbral")
+    @Test
+    public void evaluarApneaSuenyo_anayadePresionSobreUmbralSonidoEnmbral_NoSobrepasaElUmbral(){
+        //Arrange
+        aparato.disp = mock(DispositivoSilver.class);
+        when(aparato.disp.leerSensorPresion()).thenReturn(100.0f);
+        when(aparato.disp.leerSensorSonido()).thenReturn(30.0f);
         aparato.obtenerNuevaLectura();
         boolean pasaElUmbral = false;
 

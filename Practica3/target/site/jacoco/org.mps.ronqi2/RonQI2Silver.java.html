@@ -23,15 +23,15 @@ public class RonQI2Silver extends RonQI2{
      * contenedores.
     */
     public void obtenerNuevaLectura(){
-<span class="nc" id="L26">        lecturasP.add(disp.leerSensorPresion());</span>
-<span class="nc bnc" id="L27" title="All 2 branches missed.">        if(lecturasP.size()&gt;numLecturas){</span>
-<span class="nc" id="L28">            lecturasP.remove(0); </span>
+<span class="fc" id="L26">        lecturasP.add(disp.leerSensorPresion());</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if(lecturasP.size()&gt;numLecturas){</span>
+<span class="fc" id="L28">            lecturasP.remove(0); </span>
         }
-<span class="nc" id="L30">        lecturasS.add(disp.leerSensorPresion()); // TODO Debe leer el sonido no la presion</span>
-<span class="nc bnc" id="L31" title="All 2 branches missed.">        if(lecturasS.size()&gt;numLecturas){</span>
-<span class="nc" id="L32">            lecturasS.remove(0); </span>
+<span class="fc" id="L30">        lecturasS.add(disp.leerSensorSonido()); // Debe leer el sonido no la presion</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        if(lecturasS.size()&gt;numLecturas){</span>
+<span class="fc" id="L32">            lecturasS.remove(0); </span>
         }
-<span class="nc" id="L34">    }</span>
+<span class="fc" id="L34">    }</span>
 
     /* 
      * Evalua la apnea del sueno. 
@@ -42,22 +42,22 @@ public class RonQI2Silver extends RonQI2{
     @Override
     public boolean evaluarApneaSuenyo() {
         boolean resultado;
-<span class="nc" id="L45">        Double avgP = lecturasP.stream()</span>
-<span class="nc" id="L46">                .mapToDouble(d -&gt; d)</span>
-<span class="nc" id="L47">                .average()</span>
-<span class="nc" id="L48">                .orElse(0.0);</span>
-<span class="nc" id="L49">        Double avgS = lecturasS.stream()</span>
-<span class="nc" id="L50">                .mapToDouble(d -&gt; d)</span>
-<span class="nc" id="L51">                .average()</span>
-<span class="nc" id="L52">                .orElse(0.0);</span>
+<span class="fc" id="L45">        Double avgP = lecturasP.stream()</span>
+<span class="fc" id="L46">                .mapToDouble(d -&gt; d)</span>
+<span class="fc" id="L47">                .average()</span>
+<span class="fc" id="L48">                .orElse(0.0);</span>
+<span class="fc" id="L49">        Double avgS = lecturasS.stream()</span>
+<span class="fc" id="L50">                .mapToDouble(d -&gt; d)</span>
+<span class="fc" id="L51">                .average()</span>
+<span class="fc" id="L52">                .orElse(0.0);</span>
         
-<span class="nc bnc" id="L54" title="All 4 branches missed.">        if (avgP&gt;=thresholdP &amp;&amp; avgS &gt; thresholdS){ // TODO este debe devolver true (según el comentario)</span>
-<span class="nc" id="L55">            resultado = false;</span>
+<span class="fc bfc" id="L54" title="All 4 branches covered.">        if (avgP &gt; thresholdP &amp;&amp; avgS &gt; thresholdS){ // debe ser &gt;thresholdP y no &gt;=thresholdP</span>
+<span class="fc" id="L55">            resultado = true; // se ha cambiado para que devuelva true cuando sobrepasa el umbral</span>
         }   
         else{
-<span class="nc" id="L58">            resultado = true;</span>
+<span class="fc" id="L58">            resultado = false;</span>
         }
-<span class="nc" id="L60">        return resultado;</span>
+<span class="fc" id="L60">        return resultado;</span>
     }
 
    
