@@ -1,3 +1,5 @@
+//Eduardo González Bautista y Juan Manuel Valenzuela
+
 package org.mps.ronqi2;
 
 
