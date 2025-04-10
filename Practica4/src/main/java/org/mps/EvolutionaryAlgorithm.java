@@ -44,8 +44,17 @@ public class EvolutionaryAlgorithm {
     }
 
 
+    // basicamente coge dos padres crea dos hijos (con toda la poblacion)
+    // (supuestamente aleatoriamente pero son los hijos consecutivos)
+    // y si esos hijos son mejores que sus padres los sustituye y
+    // elimina los padres dejando los hijos
+    // Los dos padres seleccionados en cada iteración están en las posiciones i e i+1 de la población
+    // Sus descendientes (los dos hijos) se colocan en las mismas posiciones i e i+1 de la población de descendientes
+    // En la fase de reemplazo, cada hijo compite específicamente con el individuo que ocupa su misma posición
+
     public int[][] optimize(int[][] population) throws EvolutionaryAlgorithmException {
 
+        // AYUDA HAY QUE COMPROBAR QUE SEA PAR
         if (population != null && population.length  > 0 ) {
             // Creamos una nueva población para los descendientes
             int[][] offspringPopulation = new int[population.length][population[0].length];
