@@ -38,18 +38,18 @@ public class GaussianMutation implements MutationOperator {
 
     @Override
     public int[] mutate(int[] individual) throws EvolutionaryAlgorithmException {
-<span class="nc bnc" id="L41" title="All 4 branches missed.">        if (individual == null || individual.length == 0) {</span>
+<span class="pc bpc" id="L41" title="2 of 4 branches missed.">        if (individual == null || individual.length == 0) {</span>
 <span class="nc" id="L42">            throw new EvolutionaryAlgorithmException(&quot;No se puede realizar la mutación&quot;);</span>
         }
         
-<span class="nc" id="L45">        int[] mutatedIndividual = individual.clone();</span>
-<span class="nc bnc" id="L46" title="All 2 branches missed.">        for (int i = 0; i &lt; mutatedIndividual.length; i++) {</span>
-<span class="nc bnc" id="L47" title="All 2 branches missed.">            if (random.nextDouble() &lt; mutationRate) {</span>
+<span class="fc" id="L45">        int[] mutatedIndividual = individual.clone();</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        for (int i = 0; i &lt; mutatedIndividual.length; i++) {</span>
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">            if (random.nextDouble() &lt; mutationRate) {</span>
 <span class="nc" id="L48">                mutatedIndividual[i] += Math.round((random.nextGaussian() * standardDeviation));</span>
             }
         }
         
-<span class="nc" id="L52">        return mutatedIndividual;</span>
+<span class="fc" id="L52">        return mutatedIndividual;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

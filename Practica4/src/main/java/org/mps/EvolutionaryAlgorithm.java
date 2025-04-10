@@ -53,9 +53,7 @@ public class EvolutionaryAlgorithm {
     // En la fase de reemplazo, cada hijo compite específicamente con el individuo que ocupa su misma posición
 
     public int[][] optimize(int[][] population) throws EvolutionaryAlgorithmException {
-
-        // AYUDA HAY QUE COMPROBAR QUE SEA PAR
-        if (population != null && population.length  > 0 ) {
+        if (population != null && population.length  > 0 && population.length % 2 == 0) { // ERROR ARREGLADO: la poplacion debe ser par
             // Creamos una nueva población para los descendientes
             int[][] offspringPopulation = new int[population.length][population[0].length];
 
@@ -64,7 +62,6 @@ public class EvolutionaryAlgorithm {
                 // Seleccionamos dos individuos de la población actual
                 int[] parent1 = selectionOperator.select(population[i]);
                 int[] parent2 = selectionOperator.select(population[i + 1]);
-               
                 // Aplicamos el operador de cruce para generar dos descendientes
                 int[][] offspring = crossoverOperator.crossover(parent1, parent2);
                 offspringPopulation[i] = offspring[0];
