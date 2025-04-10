@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EvolutionaryAlgorithm.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mps4</a> &gt; <a href="index.source.html" class="el_package">org.mps</a> &gt; <span class="el_source">EvolutionaryAlgorithm.java</span></div><h1>EvolutionaryAlgorithm.java</h1><pre class="source lang-java linenums">package org.mps;
+
+import org.mps.crossover.CrossoverOperator;
+import org.mps.mutation.MutationOperator;
+import org.mps.selection.SelectionOperator;
+
+/**
+ * La clase EvolutionaryAlgorithm representa un algoritmo evolutivo básico que
+ * se utiliza para resolver problemas de optimización.
+ * Este algoritmo se basa en el proceso de evolución biológica y sigue una serie
+ * de pasos para mejorar progresivamente una población de soluciones candidatas.
+ *
+ * El proceso de optimización se realiza en varias etapas:
+ * 1. Selección: Se seleccionan las soluciones más aptas para ser utilizadas
+ * como progenitores en la próxima generación. Esto se realiza mediante
+ * operadores de selección como la selección de torneo, etc.
+ * 2. Cruce: Se aplican operadores de cruce a los progenitores seleccionados
+ * para generar una nueva población de descendientes. Esto implica la
+ * combinación de características de dos o más soluciones candidatas para
+ * producir nuevas soluciones.
+ * 3. Mutación: Ocasionalmente, se aplican operadores de mutación a los
+ * descendientes generados para introducir variabilidad en la población y evitar
+ * la convergencia prematura hacia un óptimo local.
+ * 4. Reemplazo: Los descendientes reemplazan a una parte de la población
+ * anterior.
+ *
+ * La clase EvolutionaryAlgorithm proporciona una implementación básica de este
+ * proceso de optimización, permitiendo la personalización mediante el uso de
+ * diferentes operadores de selección, cruce y mutación.
+ */
+public class EvolutionaryAlgorithm {
+    private SelectionOperator selectionOperator;
+    private MutationOperator mutationOperator;
+    private CrossoverOperator crossoverOperator;
+
+    public EvolutionaryAlgorithm(SelectionOperator selectionOperator, MutationOperator mutationOperator,
+<span class="fc" id="L37">            CrossoverOperator crossoverOperator) throws EvolutionaryAlgorithmException {</span>
+<span class="fc bfc" id="L38" title="All 6 branches covered.">        if (selectionOperator == null || mutationOperator == null || crossoverOperator == null) {</span>
+<span class="fc" id="L39">            throw new EvolutionaryAlgorithmException(&quot;Argumentos nulos&quot;);</span>
+        }
+<span class="fc" id="L41">        this.selectionOperator = selectionOperator;</span>
+<span class="fc" id="L42">        this.mutationOperator = mutationOperator;</span>
+<span class="fc" id="L43">        this.crossoverOperator = crossoverOperator;</span>
+<span class="fc" id="L44">    }</span>
+
+
+    public int[][] optimize(int[][] population) throws EvolutionaryAlgorithmException {
+
+<span class="nc bnc" id="L49" title="All 4 branches missed.">        if (population != null &amp;&amp; population.length  &gt; 0 ) {</span>
+            // Creamos una nueva población para los descendientes
+<span class="nc" id="L51">            int[][] offspringPopulation = new int[population.length][population[0].length];</span>
+
+            // Aplicamos operadores de selección y cruce para generar descendientes
+<span class="nc bnc" id="L54" title="All 2 branches missed.">            for (int i = 0; i &lt; population.length; i += 2) {</span>
+                // Seleccionamos dos individuos de la población actual
+<span class="nc" id="L56">                int[] parent1 = selectionOperator.select(population[i]);</span>
+<span class="nc" id="L57">                int[] parent2 = selectionOperator.select(population[i + 1]);</span>
+               
+                // Aplicamos el operador de cruce para generar dos descendientes
+<span class="nc" id="L60">                int[][] offspring = crossoverOperator.crossover(parent1, parent2);</span>
+<span class="nc" id="L61">                offspringPopulation[i] = offspring[0];</span>
+<span class="nc" id="L62">                offspringPopulation[i + 1] = offspring[1];</span>
+            }
+
+            // Aplicamos operador de mutación a los descendientes
+<span class="nc bnc" id="L66" title="All 2 branches missed.">            for (int i = 0; i &lt; offspringPopulation.length; i++) {</span>
+<span class="nc" id="L67">                offspringPopulation[i] = mutationOperator.mutate(offspringPopulation[i]);</span>
+            }
+
+            // Reemplazo
+<span class="nc bnc" id="L71" title="All 2 branches missed.">            for (int i = 0; i &lt; population.length; i++) {</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">                if (better(offspringPopulation[i], population[i])) {</span>
+<span class="nc" id="L73">                    population[i] = offspringPopulation[i];</span>
+                }
+            }
+<span class="nc" id="L76">        } else {</span>
+<span class="nc" id="L77">            throw new EvolutionaryAlgorithmException(&quot;Poblacion no valida&quot;);</span>
+        }
+<span class="nc" id="L79">        return population;</span>
+    }
+
+    /*
+     * Método que calcula que población tiene mejor calidad o fitness, que en este
+     * caso se ha establecido
+     * como el que tiene menor suma de sus elementos
+     */
+    private boolean better(int[] population1, int[] population2) {
+<span class="nc" id="L88">        int suma1 = 0;</span>
+<span class="nc" id="L89">        int suma2 = 0;</span>
+<span class="nc bnc" id="L90" title="All 6 branches missed.">        if (population1 != null &amp;&amp; population2 != null &amp;&amp; population1.length == population2.length) {</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            for (int i = 0; i &lt; population1.length; i++) {</span>
+<span class="nc" id="L92">                suma1 += population1[i];</span>
+<span class="nc" id="L93">                suma2 += population2[i];</span>
+            }
+        }
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        return suma1 &lt; suma2;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
