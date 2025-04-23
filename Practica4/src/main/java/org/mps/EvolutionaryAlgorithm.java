@@ -53,7 +53,7 @@ public class EvolutionaryAlgorithm {
     // En la fase de reemplazo, cada hijo compite específicamente con el individuo que ocupa su misma posición
 
     public int[][] optimize(int[][] population) throws EvolutionaryAlgorithmException {
-        if (population != null && population.length  > 0 && population.length % 2 == 0) { // ERROR ARREGLADO: la poplacion debe ser par
+        if (population != null && population.length  > 0 && population.length % 2 == 0) { // ERROR ARREGLADO: la poblacion debe ser par
             // Creamos una nueva población para los descendientes
             int[][] offspringPopulation = new int[population.length][population[0].length];
 

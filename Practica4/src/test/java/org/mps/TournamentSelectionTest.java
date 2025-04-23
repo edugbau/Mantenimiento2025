@@ -58,6 +58,6 @@ public class TournamentSelectionTest {
         assertEquals(poblacion.length, resultado.length);
     }
 
-    // no se puede probar cual muetsra es la mayor porque
+    // no se puede probar cual muestra es la mayor porque
     // la muestra que escoge es de forma aleatoria
 }

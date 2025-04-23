@@ -1,6 +1,7 @@
 package org.mps;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mps.crossover.TwoPointCrossover;
 
@@ -15,6 +16,7 @@ public class TwoPointCrossoverTest {
     }
 
     @Test
+    @DisplayName("Crossover con ambos padres nulos lanza excepción")
     public void crossover_AmbosPadresNulos_LanzaExcepcion() {
         // Arrange
         int[] parent1 = null;
@@ -27,6 +29,7 @@ public class TwoPointCrossoverTest {
     }
 
     @Test
+    @DisplayName("Crossover con un padre nulo lanza excepción")
     public void crossover_UnPadreNulo_LanzaExcepcion() {
         // Arrange
         int[] parent1 = {1, 2, 3};
@@ -39,6 +42,7 @@ public class TwoPointCrossoverTest {
     }
 
     @Test
+    @DisplayName("Crossover con padres de longitudes diferentes lanza excepción")
     public void crossover_PadresLongitudesDiferentes_LanzaExcepcion() {
         // Arrange
         int[] parent1 = {1, 2, 3};
@@ -51,6 +55,7 @@ public class TwoPointCrossoverTest {
     }
 
     @Test
+    @DisplayName("Crossover con padres de longitud menor o igual a uno lanza excepción")
     public void crossover_PadresLongitudMenorOIgualAUno_LanzaExcepcion() {
         // Arrange
         int[] parent1 = {1};
@@ -63,6 +68,7 @@ public class TwoPointCrossoverTest {
     }
 
     @Test
+    @DisplayName("Crossover con padres válidos devuelve descendientes")
     public void crossover_PadresValidos_DevuelveDescendientes() throws EvolutionaryAlgorithmException {
         // Arrange
         int[] parent1 = {1, 2, 3, 4};
@@ -77,6 +83,7 @@ public class TwoPointCrossoverTest {
     }
 
     @Test
+    @DisplayName("Crossover con padres válidos devuelve descendientes con segmentos intercambiados")
     public void crossover_PadresValidos_DevuelveDescendientesConSegmentosIntercambiados() throws Exception {
         // Arrange
         int[] parent1 = {1, 2, 3, 4, 5};
@@ -99,7 +106,6 @@ public class TwoPointCrossoverTest {
                 break;
             }
         }
-        assertTrue(contieneSegmentosDeAmbosPadres, "Los descendientes no contienen segmentos intercambiados de ambos padres.");
+        assertTrue(contieneSegmentosDeAmbosPadres);
     }
-
 }

@@ -28,7 +28,7 @@ public class EvolutionaryAlgorithmTest {
         algorithm = new EvolutionaryAlgorithm(tournamentSelection, gaussianMutation, twoPointCrossover);
     }
 
-
+    @DisplayName("El constructor lanza una excepción si el operador de selección es nulo")
     @Test
     public void constructor_SelectionOperatorNulo_DaExcepcion() {
         MutationOperator mutationOperator = individual -> individual; // Mock simple
@@ -39,6 +39,7 @@ public class EvolutionaryAlgorithmTest {
         );
     }
 
+    @DisplayName("El constructor lanza una excepción si el operador de mutación es nulo")
     @Test
     public void constructor_MutationOperatorNulo_DaExcepcion() {
         SelectionOperator selectionOperator = population -> population; // Mock simple
@@ -49,6 +50,7 @@ public class EvolutionaryAlgorithmTest {
         );
     }
 
+    @DisplayName("El constructor lanza una excepción si el operador de cruce es nulo")
     @Test
     public void constructor_CrossoverOperatorNulo_DaExcepcion() {
         SelectionOperator selectionOperator = population -> population; // Mock simple
@@ -59,6 +61,7 @@ public class EvolutionaryAlgorithmTest {
         );
     }
 
+    @DisplayName("El constructor lanza una excepción si todos los operadores son nulos")
     @Test
     public void constructor_TodosLosOperadoresNulos_DaExcepcion() {
         assertThrows(EvolutionaryAlgorithmException.class, () ->
@@ -128,5 +131,5 @@ public class EvolutionaryAlgorithmTest {
         assertThrows(EvolutionaryAlgorithmException.class, () -> algorithm.optimize(poblacion));
     }
 
-
+        //No hay full coverage en better porque es privado
 }
