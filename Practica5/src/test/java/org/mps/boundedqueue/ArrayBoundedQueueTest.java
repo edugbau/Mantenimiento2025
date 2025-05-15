@@ -8,6 +8,8 @@ import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.*;
 
+//TODO: EDUARDO GONZÁLEZ BAUTISTA Y JUAN MANUEL VALENZUELA GONZÁLEZ
+
 public class ArrayBoundedQueueTest {
 
     @Test
