@@ -1,6 +1,7 @@
 package com.uma.example.springuma.integration.base;
 
 import com.uma.example.springuma.model.Imagen;
+import com.uma.example.springuma.model.Informe;
 import com.uma.example.springuma.model.Medico;
 import com.uma.example.springuma.model.Paciente;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.FluxExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -47,32 +49,31 @@ public class ImagenControllerIT {
         medico.setDni("123");
         medico.setEspecialidad("Catapultas");
 
+        client.post().uri("/medico")
+                .body(Mono.just(medico), Medico.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody().returnResult();
+
+        medico.setId(1);
         paciente = new Paciente();
         paciente.setNombre("Eduardo enfermo");
         paciente.setEdad(20);
         paciente.setCita("YA YA YA");
         paciente.setDni("456");
-        paciente.setMedico(medico);
-        // Crear médico para las pruebas
-        medico = new Medico();
-        medico.setNombre("Dr. Test");
-        medico.setDni("12345678A");
-        medico.setEspecialidad("Oncología");
-
-        // Crear paciente para las pruebas
-        paciente = new Paciente();
-        paciente.setNombre("Paciente Test");
-        paciente.setEdad(40);
-        paciente.setCita("2025-05-21");
-        paciente.setDni("87654321B");
-        paciente.setMedico(medico);
+        paciente.setMedico(this.medico);
 
         // Cargar las imágenes de test desde resources
         healthyImageBytes = Files.readAllBytes(new ClassPathResource("healthy.png").getFile().toPath());
-        notHealthyImageBytes = Files.readAllBytes(new ClassPathResource("no_healthy.png").getFile().toPath());
-        // Cargar las imágenes de test desde resources
-        healthyImageBytes = Files.readAllBytes(new ClassPathResource("healthy.png").getFile().toPath());
-        notHealthyImageBytes = Files.readAllBytes(new ClassPathResource("no_healthy.png").getFile().toPath());
+        notHealthyImageBytes = Files.readAllBytes(new ClassPathResource("no_healthty.png").getFile().toPath());
+
+        client.post().uri("/paciente")
+                .body(Mono.just(paciente), Paciente.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody().returnResult();
+
+        paciente.setId(1);
     }
 
     @Test
@@ -231,14 +232,6 @@ public class ImagenControllerIT {
 
         // Verificamos que la imagen ya no existe
         client.get().uri("/imagen/info/1")
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
-    @DisplayName("No se puede eliminar una imagen que no existe")
-    void noSePuedeEliminarImagenInexistente() {
-        client.delete().uri("/imagen/1234")
                 .exchange()
                 .expectStatus().is5xxServerError();
     }

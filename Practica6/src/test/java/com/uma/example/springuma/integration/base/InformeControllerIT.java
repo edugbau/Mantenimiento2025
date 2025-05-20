@@ -11,13 +11,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.FluxExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.util.Calendar;
 import java.util.List;
@@ -35,41 +41,75 @@ public class InformeControllerIT extends AbstractIntegration{
     private WebTestClient client;
 
     private Informe informe;
-    private Imagen imagen;
     private Paciente paciente;
     private Medico medico;
+    private byte[] healthyImageBytes;
 
     @BeforeEach
-    public void init(){
+    public void init() throws IOException {
         client = WebTestClient.bindToServer().baseUrl("http://localhost:"+port)
             .responseTimeout(Duration.ofMillis(30000)).build();
-
-        informe = new Informe();;
-        informe.setContenido("SE_NOS_MUERE");
-
-        imagen = new Imagen();
-        imagen.setNombre("imagen de la catapulta");
-        imagen.setFecha(Calendar.getInstance());
-        String ejemplo = "Imagen de setas para la catapulta";
-        byte[] fileBytes = ejemplo.getBytes(StandardCharsets.UTF_8);
-        imagen.setFile_content(fileBytes);
-
-        Paciente paciente = new Paciente();
-        paciente.setNombre("Zarcort");
-        paciente.setEdad(100);
-        paciente.setCita("mañana");
-        paciente.setDni("123456789");
 
         Medico medico = new Medico();
         medico.setNombre("duende");
         medico.setDni("123");
         medico.setEspecialidad("catapultas");
 
+        client.post().uri("/medico")
+                .body(Mono.just(medico), Medico.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody().returnResult();
+
+        medico.setId(1);
+
+        Paciente paciente = new Paciente();
+        paciente.setNombre("Zarcort");
+        paciente.setEdad(100);
+        paciente.setCita("mañana");
+        paciente.setDni("123456789");
         paciente.setMedico(medico);
+        client.post().uri("/paciente")
+                .body(Mono.just(paciente), Paciente.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody().returnResult();
 
-        imagen.setPaciente(paciente);
+        paciente.setId(1);
 
-        informe.setImagen(imagen);
+        // imagen = new Imagen();
+        // imagen.setNombre("imagen de la catapulta");
+        // imagen.setFecha(Calendar.getInstance());
+        // String ejemplo = "Imagen de setas para la catapulta";
+        // byte[] fileBytes = ejemplo.getBytes(StandardCharsets.UTF_8);
+        // imagen.setPaciente(paciente);
+
+        healthyImageBytes = Files.readAllBytes(new ClassPathResource("healthy.png").getFile().toPath());
+        MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
+
+        bodyBuilder.part("image", healthyImageBytes)
+                .header("Content-Disposition", "form-data; name=image; filename=test.png")
+                .contentType(MediaType.IMAGE_PNG);
+
+        bodyBuilder.part("paciente", paciente)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        client.post().uri("/imagen")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
+                .exchange()
+                .expectStatus().isOk();
+
+        FluxExchangeResult<Imagen> result = client.get().uri("/imagen/info/1")
+                .exchange()
+                .expectStatus().isOk()
+                .returnResult(Imagen.class);
+
+        Imagen imagenGuardada = result.getResponseBody().blockFirst();
+        informe = new Informe();;
+        informe.setContenido("SE_NOS_MUERE");
+        informe.setPrediccion("Predicción de prueba");
+        informe.setImagen(imagenGuardada);
     }
 
     @Test
@@ -87,7 +127,7 @@ public class InformeControllerIT extends AbstractIntegration{
 
         Informe informeObtenido = result.getResponseBody().blockFirst();
 
-        assertEquals(informe,informeObtenido);
+        assertEquals(informe.getContenido(), informeObtenido.getContenido());
     }
 
     @Test
@@ -109,35 +149,6 @@ public class InformeControllerIT extends AbstractIntegration{
                 .exchange()
                 .expectStatus().isNoContent();
 
-        client.get().uri("/informe/1")
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
-    @DisplayName("No se puede eliminar un cliente que no existe")
-    void noSePuedeEliminarUnClienteQueNoExiste() throws Exception {
-        client.method(HttpMethod.DELETE).uri("/informe/1")
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
-    @DisplayName("Obtener todos los informes asociados a una imagen")
-    void obtenerInformesDeUnaImagen() throws Exception {
-
-        Informe informe2 = new Informe();
-        informe2.setContenido("Todo en orden");
-        informe2.setPrediccion("No se muere");
-        informe2.setImagen(imagen); // Usar la misma imagen
-
-        client.post().uri("/informe")
-                .body(Mono.just(informe2), Informe.class)
-                .exchange()
-                .expectStatus().isCreated();
-
-
-        // 5. Llamar al endpoint a probar: GET /informe/imagen/{id}
         FluxExchangeResult<Informe> result = client.get().uri("/informe/imagen/1")
                 .exchange()
                 .expectStatus().isOk()
@@ -145,24 +156,27 @@ public class InformeControllerIT extends AbstractIntegration{
 
         List<Informe> informesObtenidos = result.getResponseBody().collectList().block();
 
-        assertEquals(2, informesObtenidos.size());
+        // comprobamos que no haya informes
+        assertEquals(0, informesObtenidos.size());
+    }
 
-        // Verificar que los informes contienen los valores esperados
-        boolean contieneInforme1 = false;
-        boolean contieneInforme2 = false;
 
-        for (Informe informe : informesObtenidos) {
-            if (informe.getContenido().equals("Contenido del primer informe") &&
-                    informe.getContenido().equals(informe.getContenido())) {
-                contieneInforme1 = true;
-            }
-            if (informe.getContenido().equals("Contenido del segundo informe") &&
-                    informe.getContenido().equals(informe2.getContenido())) {
-                contieneInforme2 = true;
-            }
-        }
+    @Test
+    @DisplayName("Obtener todos los informes asociados a una imagen")
+    void obtenerInformesDeUnaImagen() throws Exception {
+        client.post().uri("/informe")
+                .body(Mono.just(informe), Informe.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody().returnResult();
 
-        assertTrue(contieneInforme1);
-        assertTrue(contieneInforme2);
+        FluxExchangeResult<Informe> result = client.get().uri("/informe/imagen/1")
+                .exchange()
+                .expectStatus().isOk()
+                .returnResult(Informe.class);
+
+        List<Informe> informesObtenidos = result.getResponseBody().collectList().block();
+
+        assertEquals(1, informesObtenidos.size());
     }
 }

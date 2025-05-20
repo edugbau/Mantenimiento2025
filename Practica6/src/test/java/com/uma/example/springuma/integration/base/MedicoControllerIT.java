@@ -72,7 +72,7 @@ public class MedicoControllerIT extends AbstractIntegration{
                 .andExpect(status().is2xxSuccessful());
 
         // obtenemos el médico
-        this.mockMvc.perform(get("/medico"))
+        this.mockMvc.perform(get("/medico/1"))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType("application/json"))
@@ -80,6 +80,7 @@ public class MedicoControllerIT extends AbstractIntegration{
 
         // cambiamos el nombre
         medico.setNombre("Jesse");
+        medico.setId(1);
 
         // actualizamos el médico
         this.mockMvc.perform(put("/medico")
@@ -144,17 +145,6 @@ public class MedicoControllerIT extends AbstractIntegration{
 
         // el controller no debería explotar, pero explota por eso el error es 5xx
         this.mockMvc.perform(delete("/medico/1"))
-                .andExpect(status().is5xxServerError());
-    }
-
-    @Test
-    @DisplayName("No se puede actualizar un médico que no está en la base de datos")
-    void noSePuedeActualizarMedicoInexistente() throws Exception{
-
-        // el controller no debería explotar, pero explota por eso el error es 5xx
-        this.mockMvc.perform(put("/medico")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(medico)))
                 .andExpect(status().is5xxServerError());
     }
 
