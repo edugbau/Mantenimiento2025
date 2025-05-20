@@ -12,8 +12,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,15 +35,32 @@ public class PacienteControllerIT extends AbstractIntegration{
         paciente.setEdad(17);
         paciente.setDni("11111111A");
 
+
         Medico medico = new Medico();
         medico.setNombre("Pimp flaco");
         medico.setDni("22222222B");
+        medico.setEspecialidad("amor");
+
+        // Guardar el médico vía API
+        this.mockMvc.perform(post("/medico")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(medico)))
+                .andExpect(status().isCreated());
+
+        // Recuperar el médico guardado para obtener su ID
+        String medicoJson = this.mockMvc.perform(get("/medico/dni/22222222B"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        medico = objectMapper.readValue(medicoJson, Medico.class);
+
 
         paciente.setMedico(medico);
     }
 
     @Test
-    @DisplayName("Crear un paciente y recibirlo correctamente")
+    @DisplayName("Crear un paciente y modificarlo correctamente")
     public void crearPacienteYRecibirloCorrectamente() throws Exception {
 
         //crear
@@ -59,15 +75,16 @@ public class PacienteControllerIT extends AbstractIntegration{
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$[0]").value(paciente));
+                .andExpect(jsonPath("$.nombre").value("Kinder Malo"));
 
         //actualizar
+        paciente.setId(1); //Hecho para poder actualizar, en el sistema real no tendría sentido
         paciente.setNombre("Kinder Bueno");
 
-        this.mockMvc.perform(post("/paciente").
+        this.mockMvc.perform(put("/paciente").
                         contentType("application/json").
                         content(objectMapper.writeValueAsString(paciente))).
-                andExpect(status().isCreated()).
+                andExpect(status().isNoContent()).
                 andExpect(status().is2xxSuccessful());
 
         //comprobar los cambios
@@ -75,8 +92,8 @@ public class PacienteControllerIT extends AbstractIntegration{
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$[0].nombre").value("Kinder Bueno"));
+                .andExpect(jsonPath("$.nombre").value("Kinder Bueno"));
     }
-    // TRABAJA EDUARDO
+
 
 }
