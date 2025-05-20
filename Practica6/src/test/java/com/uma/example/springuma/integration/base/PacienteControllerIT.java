@@ -34,6 +34,7 @@ public class PacienteControllerIT extends AbstractIntegration{
         paciente.setNombre("Kinder Malo");
         paciente.setEdad(17);
         paciente.setDni("11111111A");
+        paciente.setId(1); //No se haría en el sistema real, lo hacemos en las pruebas para evitar complicaciones
 
 
         Medico medico = new Medico();
@@ -78,7 +79,6 @@ public class PacienteControllerIT extends AbstractIntegration{
                 .andExpect(jsonPath("$.nombre").value("Kinder Malo"));
 
         //actualizar
-        paciente.setId(1); //Hecho para poder actualizar, en el sistema real no tendría sentido
         paciente.setNombre("Kinder Bueno");
 
         this.mockMvc.perform(put("/paciente").
@@ -95,5 +95,63 @@ public class PacienteControllerIT extends AbstractIntegration{
                 .andExpect(jsonPath("$.nombre").value("Kinder Bueno"));
     }
 
+    @Test
+    @DisplayName("Crear y eliminar un paciente")
+    public void testCrearYEliminarPaciente() throws Exception {
+        // Crear paciente
+        this.mockMvc.perform(post("/paciente")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(paciente)))
+                .andExpect(status().isCreated());
 
+        // Obtener paciente creado
+        this.mockMvc.perform(get("/paciente/1"))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.nombre").value("Kinder Malo"));
+
+        // Eliminar paciente
+        this.mockMvc.perform(delete("/paciente/1"))
+                .andExpect(status().is2xxSuccessful());
+
+        // Comprobar que ya no existe
+        this.mockMvc.perform(get("/paciente/1"))
+                .andDo(print())
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    @DisplayName("No se puede obtener un paciente con DNI inexistente")
+    public void testObtenerPacientePorDniInexistente() throws Exception {
+        this.mockMvc.perform(get("/paciente/dni/99999999Z"))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("No se puede eliminar un paciente que no existe")
+    public void testEliminarPacienteInexistente() throws Exception {
+        this.mockMvc.perform(delete("/paciente/999"))
+                .andDo(print())
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    @DisplayName("Obtener lista de pacientes de un médico y comprobar el primero")
+    public void testObtenerPacientesDeMedicoYComprobarPrimero() throws Exception {
+        // Crear paciente
+        this.mockMvc.perform(post("/paciente")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(paciente)))
+                .andExpect(status().isCreated());
+
+        // Obtener lista de pacientes del médico
+        this.mockMvc.perform(get("/paciente/medico/1"))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$[0].nombre").value("Kinder Malo"))
+                .andExpect(jsonPath("$[0].dni").value("11111111A"));
+    }
 }
