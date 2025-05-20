@@ -45,13 +45,19 @@ public class MedicoControllerIT extends AbstractIntegration{
 
         // obtenemos el médico por la id
         this.mockMvc.perform(get("/medico/1"))
-                .andDo(print())
+                .andDo(print()) // esto es para debugear (no es necesario)
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.dni").value("123"));
 
     }
-
+    @Test
+    @DisplayName("No se puede obtener un médico con dni inválido")
+    void  noSePuedeObtenerUnMedicoConDniInvalido() throws Exception{
+        this.mockMvc.perform(get("/medico/dni/999999"))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
     @Test
     @DisplayName("Crear persona y actualizarla correctamente")
     void crearPersonaYActualizarCorrectamente() throws Exception{
@@ -61,7 +67,7 @@ public class MedicoControllerIT extends AbstractIntegration{
                 .andExpect(status().isCreated())
                 .andExpect(status().is2xxSuccessful());
 
-        // obtenemos el médico por el dni
+        // obtenemos el médico
         this.mockMvc.perform(get("/medico"))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
@@ -75,7 +81,7 @@ public class MedicoControllerIT extends AbstractIntegration{
         this.mockMvc.perform(put("/medico")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(medico)))
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andExpect(status().is2xxSuccessful());
 
         // comprobar que efectivamente se ha actualizado
@@ -86,6 +92,66 @@ public class MedicoControllerIT extends AbstractIntegration{
                 .andExpect(jsonPath("$.nombre").value("Jesse"));
 
     }
-    // hay que probar el delete y el otro get
+
+    @Test
+    @DisplayName("Crear persona y eliminarla correctamente")
+    void crearPersonaYEliminarCorrectamente() throws Exception{
+        // creamos la persona
+        this.mockMvc.perform(post("/medico")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(medico)))
+                .andExpect(status().isCreated())
+                .andExpect(status().is2xxSuccessful());
+
+        this.mockMvc.perform(get("/medico/1"))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.dni").value("123"));
+
+        this.mockMvc.perform(delete("/medico/1"))
+                .andExpect(status().is2xxSuccessful());
+
+        this.mockMvc.perform(get("/medico/dni/123"))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Crear una persona y recogerla por su dni")
+    void crearPersonaYRecogerlaPorDni() throws Exception{
+        // creamos la persona
+        this.mockMvc.perform(post("/medico")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(medico)))
+                .andExpect(status().isCreated())
+                .andExpect(status().is2xxSuccessful());
+
+
+        // obtenemos el médico por el dni y es correcto
+        this.mockMvc.perform(get("/medico/dni/123"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.dni").value("123"));
+    }
+
+    @Test
+    @DisplayName("No se puede eliminar un médico inexistente")
+    void noSePuedeEliminarUnMedicoInexistente() throws Exception{
+
+        // el controller no debería explotar, pero explota por eso el error es 5xx
+        this.mockMvc.perform(delete("/medico/1"))
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    @DisplayName("No se puede actualizar un médico que no está en la base de datos")
+    void noSePuedeActualizarMedicoInexistente() throws Exception{
+
+        // el controller no debería explotar, pero explota por eso el error es 5xx
+        this.mockMvc.perform(put("/medico")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(medico)))
+                .andExpect(status().is5xxServerError());
+    }
 
 }
