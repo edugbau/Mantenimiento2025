@@ -74,5 +74,6 @@ public class PacienteControllerIT extends AbstractIntegration{
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$[0].nombre").value("Kinder Bueno"));
     }
+    // TRABAJA EDUARDO
 
 }
