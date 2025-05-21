@@ -154,4 +154,46 @@ public class PacienteControllerIT extends AbstractIntegration{
                 .andExpect(jsonPath("$[0].nombre").value("Kinder Malo"))
                 .andExpect(jsonPath("$[0].dni").value("11111111A"));
     }
+
+    @Test
+    @DisplayName("Cambiar médico de un paciente y verificar el cambio")
+    public void testCambiarMedicoPaciente() throws Exception {
+        // Crear primer médico y paciente
+        this.mockMvc.perform(post("/paciente")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(paciente)))
+                .andExpect(status().isCreated());
+
+        // Crear segundo médico
+        Medico nuevoMedico = new Medico();
+        nuevoMedico.setNombre("Doctor Strange");
+        nuevoMedico.setDni("33333333C");
+        nuevoMedico.setEspecialidad("magia");
+
+        this.mockMvc.perform(post("/medico")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(nuevoMedico)))
+                .andExpect(status().isCreated());
+
+        // Obtener ID del nuevo médico
+        String medicoJson = this.mockMvc.perform(get("/medico/dni/33333333C"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        nuevoMedico = objectMapper.readValue(medicoJson, Medico.class);
+
+        // Cambiar médico del paciente
+        paciente.setMedico(nuevoMedico);
+
+        this.mockMvc.perform(put("/paciente")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(paciente)))
+                .andExpect(status().isNoContent());
+
+        // Verificar el cambio
+        this.mockMvc.perform(get("/paciente/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.medico.dni").value("33333333C"));
+    }
 }
