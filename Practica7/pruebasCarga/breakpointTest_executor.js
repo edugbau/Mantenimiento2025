@@ -25,3 +25,4 @@ export default function () {
     });
     sleep(0.1);
 }
+// breakpoint: unos 8000 UVS intentando procesar 4250 solicitudes por segundo
