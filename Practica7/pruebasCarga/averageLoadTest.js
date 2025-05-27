@@ -4,9 +4,9 @@ import { check, sleep } from 'k6';
 export let options = {
     stages: [
         // Rampa de subida al 50% de VUs del punto de rotura en 3 minutos
-        { duration: '3m', target: 4000 },
+        { duration: '3m', target: 4600 },
         // Mantenimiento de la carga durante 3 minutos
-        { duration: '3m', target: 4000 },
+        { duration: '3m', target: 4600 },
         // Rampa de bajada a 0 VUs en 2 minutos
         { duration: '2m', target: 0 },
     ],
