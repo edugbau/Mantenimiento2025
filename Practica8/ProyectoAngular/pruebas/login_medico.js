@@ -25,8 +25,8 @@ export default async function () {
     await page.goto('http://localhost:4200'); 
 
     // Replace with the actual locators and credentials for the doctor
-    await page.locator('input[name="nombre"]').type('John Doe'); 
-    await page.locator('input[name="DNI"]').type('12345678'); 
+    await page.locator('input[name="nombre"]').type('Patrick Bateman'); 
+    await page.locator('input[name="DNI"]').type('1234'); 
 
     const submitButton = page.locator('button[name="login"]'); 
     await Promise.all([page.waitForNavigation(), submitButton.click()]);

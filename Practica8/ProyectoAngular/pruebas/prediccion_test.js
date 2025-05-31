@@ -21,31 +21,32 @@ export const options = {
 export default async function () {
   const page = await browser.newPage();
   try {
-    // 1. Login as Doctor
-    await page.goto('http://localhost:4200'); 
-    await page.locator('input[name="nombre"]').type('John Doe'); 
-    await page.locator('input[name="DNI"]').type('12345678');    
-    
-    const loginButton = page.locator('button[name="login"]'); 
-    await Promise.all([page.waitForNavigation(), loginButton.click()]);
-
-    await check(page, {
-      'Login successful - redirected to patient list': (p) => p.locator('h2').textContent().includes('Listado de pacientes'),
-    });
-    sleep(1); // Short pause
+    // 1. Login to the application
+    await page.goto('http://localhost:4200');
+    await page.locator('input[name="nombre"]').fill('Patrick Bateman');
+    await page.locator('input[name="DNI"]').fill('1234');
+    await Promise.all([
+        page.waitForNavigation(),
+        page.locator('button[name="login"]').click()
+    ]);
 
     // 2. Navigate to a specific patient's details page
-    // USER: Replace "PacienteParaTest" with the actual name or unique identifier of the patient.
-    // Adjust the selector below based on your application's HTML structure for the patient list.
-    // Example: const patientLink = page.locator('//mat-card-title[contains(text(),"PacienteParaTest")]/ancestor::mat-card//button[contains(text(),"Ver Detalles")]');
-    const patientLink = page.locator('//a[contains(text(),"PacienteParaTest")]'); // Placeholder
-    await Promise.all([page.waitForNavigation(), patientLink.click()]);
-    
-    await check(page, {
-      'Navigated to patient details page': (p) => p.url().includes('/pacientes/') || (p.locator('h3').textContent() || '').includes('Detalles del Paciente'),
-    });
-    sleep(1);
 
+    await page.waitForSelector('mat-table tr.mat-row.clickable-row', { state: 'visible', timeout: 10000 });
+
+    const firstRow = page.locator('mat-table tr.mat-row.clickable-row').first();
+    
+    // Click the first row and wait for navigation
+    await Promise.all([
+        page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 15000 }),
+        firstRow.click()
+    ]);
+
+    // Espera a que cargue el detalle del paciente (an element on the new page)
+    await page.waitForSelector('div.detalle-paciente', { state: 'visible', timeout: 10000 });
+
+    // 3. Find and navigate to the details of the pre-uploaded image (e.g., healthty.png)
+// ...existing code...
     // 3. Find and navigate to the details of the pre-uploaded image (e.g., healthty.png)
     // USER: Ensure 'healthty.png' is the correct alt text or identifier for the image.
     // Adjust selector for how images are listed and selected on the patient details page.
