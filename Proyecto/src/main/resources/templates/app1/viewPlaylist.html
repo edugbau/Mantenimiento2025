@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Playlist: ' + ${playlist.playListName}"></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1, h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+        .form-container, .list-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .form-check-label {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 th:text="'Añadir canciones a la playlist: ' + ${playlist.playListName}"></h1>
+
+    <div class="list-container">
+        <h2>Canciones actuales de la playlist:</h2>
+        <div th:if="${playlist.playListCancionList == null || #lists.isEmpty(playlist.playListCancionList)}">
+            <p>La lista está actualmente vacía.</p>
+        </div>
+        <ul th:unless="${playlist.playListCancionList == null || #lists.isEmpty(playlist.playListCancionList)}">
+            <li th:each="pc : ${playlist.playListCancionList}">
+                <span th:text="${pc.cancionId.cancionName} + ' - ' + (${pc.cancionId.albumId != null && pc.cancionId.albumId.artistaId != null} ? ${pc.cancionId.albumId.artistaId.artistaName} : 'Artista Desconocido') + ' - ' + (${pc.cancionId.albumId != null} ? ${pc.cancionId.albumId.albumName} : 'Álbum Desconocido')"></span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="form-container">
+        <h2>Añadir canciones:</h2>
+        <form th:object="${dto}" th:action="@{/app1/addSongs(playlistId=${playlist.playListId})}" method="post">
+            <div th:if="${#lists.isEmpty(songsNotInPlaylist)}">
+                <p>No hay más canciones disponibles para añadir.</p>
+            </div>
+            <div th:unless="${#lists.isEmpty(songsNotInPlaylist)}" class="form-group">
+                <div th:each="cancion : ${songsNotInPlaylist}" class="form-check">
+                    <input type="checkbox" th:field="*{cancionesIds}" th:value="${cancion.cancionId}" th:id="${'cancion-' + cancion.cancionId}" class="form-check-input"/>
+                    <label th:for="${'cancion-' + cancion.cancionId}" 
+                           th:text="${cancion.cancionName} + ' - ' + (${cancion.albumId != null && cancion.albumId.artistaId != null} ? ${cancion.albumId.artistaId.artistaName} : 'Artista Desconocido') + ' - ' + (${cancion.albumId != null} ? ${cancion.albumId.albumName} : 'Álbum Desconocido')"
+                           class="form-check-label"></label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3" th:disabled="${#lists.isEmpty(songsNotInPlaylist)}">Añadir Seleccionadas</button>
+        </form>
+    </div>
+    
+    <div class="mt-4">
+        <a th:href="@{/app1/}" class="btn btn-info btn-sm">Crear Otra Playlist</a>
+        <a th:href="@{/seleccion}" class="btn btn-secondary btn-sm ml-2">Volver a Selección</a>
+        <form th:action="@{/logout}" method="post" class="d-inline ml-2">
+            <button type="submit" class="btn btn-danger btn-sm">Cerrar Sesión</button>
+        </form>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 

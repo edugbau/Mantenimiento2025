@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Seleccionar Funcionalidad</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <div class="jumbotron">
+        <h1 class="display-4">¡Bienvenido!</h1>
+        <p class="lead">Por favor, selecciona la funcionalidad que deseas utilizar.</p>
+        <hr class="my-4">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <a th:href="@{/app1}" class="btn btn-primary btn-lg btn-block">Gestor de Playlists</a> <!-- Ajusta /app1 a la ruta principal de tu app original -->
+            </div>
+            <div class="col-md-6 mb-3">
+                <a th:href="@{/app2}" class="btn btn-secondary btn-lg btn-block">Creador de Álbumes Recopilatorios</a> <!-- Ajusta /app2 a la ruta principal de la app de AInsertar -->
+            </div>
+        </div>
+        <form th:action="@{/logout}" method="post" class="mt-4">
+            <button type="submit" class="btn btn-danger btn-sm">Cerrar Sesión</button>
+        </form>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 

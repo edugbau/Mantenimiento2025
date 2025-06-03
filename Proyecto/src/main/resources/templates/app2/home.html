@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Artistas</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+</head>
+<body>
+<div class="container mt-4">
+    <h1>SALUDOS INTERNAUTA</h1>
+    <h2>Lista de artistas de la BD</h2>
+
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="thead-dark">
+        <tr>
+            <th>ARTISTA</th>
+            <th>NÚM. ALBUMES</th>
+            <th>NÚM. CANCIONES</th>
+            <th>NÚM COLABORACIONES</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="artista : ${artistas}">
+            <td th:text="${artista.artistaName}">Nombre Artista</td>
+            <td th:text="${artista.numAlbumes}">0</td>
+            <td th:text="${artista.cancionesPropias}">0</td>
+            <td th:text="${artista.numColabs}">0</td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(artistas)}">
+            <td colspan="4" class="text-center">No hay artistas para mostrar.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <br/>
+    <a th:href="@{/app2/addAlbum}" class="btn btn-primary">Añadir álbum</a>
+    <form th:action="@{/logout}" method="post" class="mt-3 d-inline">
+        <button type="submit" class="btn btn-danger btn-sm">Cerrar Sesión</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 

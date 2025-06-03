@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Añadir Álbum Recopilatorio</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+</head>
+<body>
+<div class="container mt-4">
+    <h1>Nuevo álbum recopilatorio</h1>
+
+    <h3 class="mt-4">Filtrar Canciones por Género</h3>
+    <form th:action="@{/app2/filter}" method="post" class="form-inline mb-3">
+        <div th:each="genero : ${generos}" class="form-check form-check-inline">
+            <input type="radio" th:name="genero" th:value="${genero.generoId}" th:id="${'genero-' + genero.generoId}" class="form-check-input">
+            <label th:for="${'genero-' + genero.generoId}" th:text="${genero.generoName}" class="form-check-label mr-2"></label>
+        </div>
+        <button type="submit" class="btn btn-info btn-sm ml-2">Filtrar</button>
+    </form>
+
+    <h3 class="mt-4">Detalles del Álbum</h3>
+    <form th:action="@{/app2/saveAlbum}" th:object="${albumRecopilatorio}" method="post">
+        <div class="form-group">
+            <label for="albumRecopilatorioName">Nombre del recopilatorio:</label>
+            <input type="text" th:field="*{albumRecopilatorioName}" id="albumRecopilatorioName" class="form-control"/>
+        </div>
+        <!-- El campo albumName no parece estar en el DTO AlbumRecopilatorio, lo comentaré por ahora -->
+        <!--
+        <div class="form-group">
+            <label for="albumName">Nombre del álbum (artista original):</label>
+            <input type="text" th:field="*{albumName}" id="albumName" class="form-control"/>
+        </div>
+        -->
+        <div class="form-group">
+            <label for="canciones">Canciones:</label>
+            <select th:field="*{canciones}" multiple="multiple" size="10" class="form-control" id="canciones">
+                <option th:each="cancion : ${canciones}" 
+                        th:value="${cancion.cancionId}" 
+                        th:text="${cancion.cancionName}">Nombre Canción</option>
+            </select>
+            <small class="form-text text-muted">Mantén presionada la tecla Ctrl (o Cmd en Mac) para seleccionar múltiples canciones.</small>
+        </div>
+        <button name="save" type="submit" class="btn btn-success">Guardar Álbum</button>
+        <a th:href="@{/app2/}" class="btn btn-secondary ml-2">Cancelar</a>
+    </form>
+
+    <form th:action="@{/logout}" method="post" class="mt-4">
+        <button type="submit" class="btn btn-danger btn-sm">Cerrar Sesión</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 

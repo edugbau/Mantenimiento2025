@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Playlist</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Creación de una playlist:</h1>
+    <div class="form-container">
+        <form th:object="${dto}" method="post" th:action="@{/app1/createPlaylist}">
+            <div class="form-group">
+                <label for="nombre">Nombre de la Playlist:</label>
+                <input type="text" th:field="*{nombre}" id="nombre" class="form-control" placeholder="Ej: Mis Favoritas"/>
+            </div>
+
+            <div class="form-group">
+                <label>Usuario:</label>
+                <div th:each="user : ${usuarios}" class="form-check">
+                    <input type="radio" th:field="*{usuarioId}" th:value="${user.usuarioId}" th:id="${'user-' + user.usuarioId}" class="form-check-input"/>
+                    <label th:for="${'user-' + user.usuarioId}" th:text="${user.usuarioName}" class="form-check-label"></label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Crear Playlist</button>
+        </form>
+    </div>
+
+    <div class="mt-4">
+         <a th:href="@{/seleccion}" class="btn btn-secondary btn-sm">Volver a Selección</a>
+         <form th:action="@{/logout}" method="post" class="d-inline ml-2">
+             <button type="submit" class="btn btn-danger btn-sm">Cerrar Sesión</button>
+         </form>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 
