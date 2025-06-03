@@ -161,7 +161,7 @@ public class AlbumControllerUnitTest {
         String viewName = albumController.doSaveAlbum(dto, model);
         
         //Assert
-        assertEquals("redirect:/app2/", viewName);
+        assertEquals("redirect:/app2", viewName);
         verify(artistaRepository).save(argThat(a -> a.getArtistaName().equals("Super Hits U")));
         verify(albumRepository).save(argThat(a -> a.getAlbumName().equals("Super Hits U") && a.getArtistaId().getArtistaName().equals("Super Hits U")));
         verify(cancionRepository).save(argThat(c -> c.getCancionName().startsWith(cancionOriginal1.getCancionName() + "(Super Hits U)")));
@@ -196,7 +196,7 @@ public class AlbumControllerUnitTest {
         String viewName = albumController.doSaveAlbum(dto, model);
         
         //Assert
-        assertEquals("redirect:/app2/", viewName);
+        assertEquals("redirect:/app2", viewName);
         verify(artistaRepository).save(argThat(a -> a.getArtistaName().equals("Empty Album U")));
         verify(albumRepository).save(argThat(a -> a.getAlbumName().equals("Empty Album U")));
         verify(cancionRepository, never()).findById(anyInt());

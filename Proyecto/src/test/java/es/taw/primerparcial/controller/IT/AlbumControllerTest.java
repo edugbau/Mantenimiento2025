@@ -1,6 +1,7 @@
-package es.taw.primerparcial.controller;
+package es.taw.primerparcial.controller.IT;
 
 import es.taw.primerparcial.config.SecurityConfig;
+import es.taw.primerparcial.controller.AlbumController;
 import es.taw.primerparcial.dao.AlbumRepository;
 import es.taw.primerparcial.dao.ArtistaRepository;
 import es.taw.primerparcial.dao.CancionRepository;

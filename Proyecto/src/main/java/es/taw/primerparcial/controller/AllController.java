@@ -74,33 +74,50 @@ public class AllController {
         return "app1/viewPlaylist.html";
     }
     @PostMapping("/addSongs")
-    public String addSongs(@ModelAttribute("dto") AddSongsObject dto,@RequestParam("playlistId") Integer playlistId, Model model) {
+    public String addSongs(@ModelAttribute("dto") AddSongsObject dto, @RequestParam("playlistId") Integer playlistId, Model model) {
         PlayList playlist = playlistRepository.findById(playlistId).orElse(null);
         if (playlist == null) {
             return "redirect:/app1/";
         }
         List<Integer> cancionesIds = dto.getCancionesIds();
-        if (cancionesIds != null && !cancionesIds.isEmpty()) {
-            for (Integer cancionId : cancionesIds) {
-                cancionRepository.findById(cancionId).ifPresent(cancion -> {
-                    PlayListCancion pc = new PlayListCancion();
-                    pc.setCancionId(cancion);
-                    pc.setPlayListId(playlist);
-                    playlistCancionRepository.save(pc);
+        if (cancionesIds == null || cancionesIds.isEmpty()) {
+            model.addAttribute("error", "No se seleccionaron canciones para añadir.");
+            model.addAttribute("playlist", playlist);
+            model.addAttribute("songsNotInPlaylist", cancionRepository.findSongsNotInPlaylist(playlist));
+            model.addAttribute("dto", new AddSongsObject());
+            return "redirect:/app1/viewPlaylist?playlistId=" + playlist.getPlayListId();
+        }
+        boolean notFound = false;
+        for (Integer cancionId : cancionesIds) {
+            var cancionOpt = cancionRepository.findById(cancionId);
+            if (cancionOpt.isPresent()) {
+                Cancion cancion = cancionOpt.get();
+                PlayListCancion pc = new PlayListCancion();
+                pc.setCancionId(cancion);
+                pc.setPlayListId(playlist);
+                playlistCancionRepository.save(pc);
 
-                    if (cancion.getPlayListCancionList() == null) {
-                        cancion.setPlayListCancionList(new ArrayList<>());
-                    }
-                    cancion.getPlayListCancionList().add(pc);
-                    cancionRepository.save(cancion);
+                if (cancion.getPlayListCancionList() == null) {
+                    cancion.setPlayListCancionList(new ArrayList<>());
+                }
+                cancion.getPlayListCancionList().add(pc);
+                cancionRepository.save(cancion);
 
-                    if (playlist.getPlayListCancionList() == null) {
-                        playlist.setPlayListCancionList(new ArrayList<>());
-                    }
-                    playlist.getPlayListCancionList().add(pc);
-                    playlistRepository.save(playlist);
-                });
+                if (playlist.getPlayListCancionList() == null) {
+                    playlist.setPlayListCancionList(new ArrayList<>());
+                }
+                playlist.getPlayListCancionList().add(pc);
+                playlistRepository.save(playlist);
+            } else {
+                notFound = true;
             }
+        }
+        if (notFound) {
+            model.addAttribute("error", "Algunas canciones no se encontraron y no pudieron ser añadidas.");
+            model.addAttribute("playlist", playlist);
+            model.addAttribute("songsNotInPlaylist", cancionRepository.findSongsNotInPlaylist(playlist));
+            model.addAttribute("dto", new AddSongsObject());
+            return "redirect:/app1/viewPlaylist?playlistId=" + playlist.getPlayListId();
         }
         return "redirect:/app1/viewPlaylist?playlistId=" + playlist.getPlayListId();
     }

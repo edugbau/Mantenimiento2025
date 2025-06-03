@@ -1,6 +1,7 @@
-package es.taw.primerparcial.controller;
+package es.taw.primerparcial.controller.IT;
 
 import es.taw.primerparcial.config.SecurityConfig;
+import es.taw.primerparcial.controller.AllController;
 import es.taw.primerparcial.dao.CancionRepository;
 import es.taw.primerparcial.dao.PlaylistCancionRepository;
 import es.taw.primerparcial.dao.PlaylistRepository;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Date;
 
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;

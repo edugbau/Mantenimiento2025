@@ -249,7 +249,7 @@ public class AllControllerUnitTest {
         String viewName = allController.addSongs(dto, playlistId, model);
         
         //Assert
-        assertEquals("app1/viewPlaylist.html", viewName); // Se queda en la misma página para mostrar error
+        assertEquals(String.format("redirect:/app1/viewPlaylist?playlistId=%d",playlistId), viewName);
         verify(playlistRepository).findById(playlistId);
         verify(cancionRepository).findById(nonExistentCancionId);
         verify(model).addAttribute("error", "Algunas canciones no se encontraron y no pudieron ser añadidas.");
@@ -275,7 +275,7 @@ public class AllControllerUnitTest {
         String viewName = allController.addSongs(dto, playlistId, model);
         
         //Assert
-        assertEquals("app1/viewPlaylist.html", viewName); // Se queda en la misma página
+        assertEquals(String.format("redirect:/app1/viewPlaylist?playlistId=%d",playlistId), viewName);
         verify(playlistRepository).findById(playlistId);
         verify(model).addAttribute("error", "No se seleccionaron canciones para añadir.");
         verify(playlistCancionRepository, never()).save(any(PlayListCancion.class));
@@ -300,7 +300,7 @@ public class AllControllerUnitTest {
         String viewName = allController.addSongs(dto, playlistId, model);
         
         //Assert
-        assertEquals("app1/viewPlaylist.html", viewName); // Se queda en la misma página
+        assertEquals(String.format("redirect:/app1/viewPlaylist?playlistId=%d",playlistId), viewName);
         verify(playlistRepository).findById(playlistId);
         verify(model).addAttribute("error", "No se seleccionaron canciones para añadir.");
         verify(playlistCancionRepository, never()).save(any(PlayListCancion.class));

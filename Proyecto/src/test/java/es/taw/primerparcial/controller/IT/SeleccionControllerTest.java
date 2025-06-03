@@ -1,6 +1,7 @@
-package es.taw.primerparcial.controller;
+package es.taw.primerparcial.controller.IT;
 
 import es.taw.primerparcial.config.SecurityConfig;
+import es.taw.primerparcial.controller.SeleccionController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
