@@ -101,7 +101,7 @@ public class AlbumController {
                 });
             }
         }
-        return "redirect:/app2/";
+        return "redirect:/app2";
     }
 
     @Transactional(readOnly = true)
