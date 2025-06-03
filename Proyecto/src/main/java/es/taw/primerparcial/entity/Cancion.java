@@ -138,8 +138,13 @@ public class Cancion implements Serializable {
 
     @Override
     public String toString() {
-        return this.getCancionName() + " - " + this.getAlbumId().getArtistaId().getArtistaName() + " - " + this.getAlbumId().getAlbumName();
-
+        return "Cancion{" +
+                "cancionId=" + cancionId +
+                ", cancionName='" + cancionName + '\'' +
+                ", albumId=" + (albumId != null ? albumId.getAlbumId() : "null") +
+                ", artistaId=" + (albumId != null && albumId.getArtistaId() != null ?
+                albumId.getArtistaId().getArtistaId() : "null") +
+                '}';
     }
     public String getDisplayText(){
         return this.toString();

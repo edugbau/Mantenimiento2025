@@ -106,10 +106,16 @@ public class AlbumController {
 
     @Transactional(readOnly = true)
     @PostMapping("/filter")
-    public String doFilter(@RequestParam(required = false) Genero genero, Model model) {
+    public String doFilter(@RequestParam(required = false) Integer generoId, Model model) {
+        if (generoId == null) {
+            return "redirect:/app2/addAlbum";
+        }
+
+        Genero genero = generoRepository.findById(generoId).orElse(null);
         if (genero == null) {
             return "redirect:/app2/addAlbum";
         }
+
         AlbumRecopilatorio albumRecopilatorio = new AlbumRecopilatorio();
         model.addAttribute("albumRecopilatorio", albumRecopilatorio);
         List<Cancion> canciones = cancionRepository.findByGenero(genero);

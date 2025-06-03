@@ -207,17 +207,20 @@ public class AlbumControllerUnitTest {
     @DisplayName("doFilter() con género debería devolver vista 'app2/addAlbum.html' y canciones filtradas")
     void doFilter_conGenero_devuelveVistaYCancionesFiltradas() {
         //Arrange
-        List<Cancion> filteredCanciones = new ArrayList<>(cancionList); // Simula una lista de canciones filtradas
+        Integer generoId = testGenero.getGeneroId();
+        List<Cancion> filteredCanciones = new ArrayList<>(cancionList);
+        when(generoRepository.findById(generoId)).thenReturn(Optional.of(testGenero));
         when(cancionRepository.findByGenero(testGenero)).thenReturn(filteredCanciones);
-        when(generoRepository.findAll()).thenReturn(generoList); // Para rellenar el desplegable de géneros
-        
+        when(generoRepository.findAll()).thenReturn(generoList);
+
         //Act
-        String viewName = albumController.doFilter(testGenero, model);
-        
+        String viewName = albumController.doFilter(generoId, model);  // Pasar el ID en lugar del objeto
+
         //Assert
         assertEquals("app2/addAlbum.html", viewName);
+        verify(generoRepository).findById(generoId);
         verify(cancionRepository).findByGenero(testGenero);
-        verify(generoRepository).findAll(); // Asegura que se cargan los géneros para la vista
+        verify(generoRepository).findAll();
         verify(model).addAttribute(eq("albumRecopilatorio"), any(AlbumRecopilatorio.class));
         verify(model).addAttribute("canciones", filteredCanciones);
         verify(model).addAttribute("generos", generoList);
@@ -227,12 +230,12 @@ public class AlbumControllerUnitTest {
     @DisplayName("doFilter() sin género debería redirigir a '/app2/addAlbum'")
     void doFilter_sinGenero_redirigeAAddAlbum() {
         //Act
-        String viewName = albumController.doFilter(null, model);
-        
+        String viewName = albumController.doFilter(null, model);  // Ya es correcto si está pasando null
+
         //Assert
         assertEquals("redirect:/app2/addAlbum", viewName);
         verify(cancionRepository, never()).findByGenero(any(Genero.class));
-        verify(generoRepository, never()).findAll(); // No debería cargar géneros si redirige
-        verify(model, never()).addAttribute(anyString(), any()); // No debería añadir atributos si redirige
+        verify(generoRepository, never()).findAll();
+        verify(model, never()).addAttribute(anyString(), any());
     }
 } 

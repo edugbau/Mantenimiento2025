@@ -124,13 +124,27 @@ public class AlbumControllerTest {
     @Test
     @WithMockUser
     public void testGetAddAlbum_authenticated() throws Exception {
-        //Arrange
+        // Arrange
+        // Crear un álbum y asignarlo a la canción para evitar NullPointerException
+        es.taw.primerparcial.entity.Album album = new es.taw.primerparcial.entity.Album();
+        album.setAlbumId(1);
+        album.setAlbumName("Álbum Test");
+        // Puedes asignar un artista ficticio si es necesario por la lógica de toString()
+        Artista artista = new Artista();
+        artista.setArtistaId(1);
+        artista.setArtistaName("Artista Test");
+        album.setArtistaId(artista);
+
+        // Asignar el álbum a cada canción
+        for (Cancion c : cancionList) {
+            c.setAlbumId(album);
+        }
+
         when(cancionRepository.findAll()).thenReturn(cancionList);
         when(generoRepository.findAll()).thenReturn(generoList);
 
-        //Act
+        // Act & Assert
         mockMvc.perform(get("/app2/addAlbum"))
-        //Assert
                 .andExpect(status().isOk())
                 .andExpect(view().name("app2/addAlbum.html"))
                 .andExpect(model().attributeExists("albumRecopilatorio"))
@@ -198,22 +212,18 @@ public class AlbumControllerTest {
     @WithMockUser
     public void testFilter_withGenero() throws Exception {
         //Arrange
-        Genero generoToFilterBy = generoList.get(0); // Genero con ID 1
+        Genero generoToFilterBy = generoList.get(0);
         List<Cancion> filteredCanciones = new ArrayList<>(cancionList);
 
-        // Esta es la parte crucial: cuando Spring intente convertir el parámetro "genero=1"
-        // a un objeto Genero, usará el converter registrado. Si el converter por defecto
-        // (o uno personalizado) usa findById, este mock lo cubrirá.
         when(generoRepository.findById(generoToFilterBy.getGeneroId())).thenReturn(Optional.of(generoToFilterBy));
-
         when(cancionRepository.findByGenero(generoToFilterBy)).thenReturn(filteredCanciones);
-        when(generoRepository.findAll()).thenReturn(generoList); // Para rellenar el modelo
+        when(generoRepository.findAll()).thenReturn(generoList);
 
         //Act
         mockMvc.perform(post("/app2/filter")
-                .param("genero", String.valueOf(generoToFilterBy.getGeneroId())) // Enviar el ID del género
-                .with(csrf()))
-        //Assert
+                        .param("generoId", String.valueOf(generoToFilterBy.getGeneroId()))
+                        .with(csrf()))
+                //Assert
                 .andExpect(status().isOk())
                 .andExpect(view().name("app2/addAlbum.html"))
                 .andExpect(model().attributeExists("albumRecopilatorio"))

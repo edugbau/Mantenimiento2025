@@ -217,21 +217,21 @@ public class AllControllerTest {
     public void testAddSongs_success() throws Exception {
         //Arrange
         when(playlistRepository.findById(testPlaylist.getPlayListId())).thenReturn(Optional.of(testPlaylist));
-        Cancion cancionToAdd1 = songsNotInPlaylist.get(0); // ID 1
-        Cancion cancionToAdd2 = songsNotInPlaylist.get(1); // ID 2
+        Cancion cancionToAdd1 = songsNotInPlaylist.get(0);
+        Cancion cancionToAdd2 = songsNotInPlaylist.get(1);
         when(cancionRepository.findById(cancionToAdd1.getCancionId())).thenReturn(Optional.of(cancionToAdd1));
         when(cancionRepository.findById(cancionToAdd2.getCancionId())).thenReturn(Optional.of(cancionToAdd2));
 
-        //Act
+        //Act - Corrigiendo el nombre del parámetro
         mockMvc.perform(post("/app1/addSongs")
-                .param("playlistId", String.valueOf(testPlaylist.getPlayListId()))
-                .param("songIds", String.valueOf(cancionToAdd1.getCancionId()), String.valueOf(cancionToAdd2.getCancionId()))
-                .with(csrf()))
-        //Assert
+                        .param("playlistId", String.valueOf(testPlaylist.getPlayListId()))
+                        .param("cancionesIds", String.valueOf(cancionToAdd1.getCancionId()), String.valueOf(cancionToAdd2.getCancionId()))
+                        .with(csrf()))
+                //Assert
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/app1/viewPlaylist?playlistId=" + testPlaylist.getPlayListId()));
 
-        verify(playlistCancionRepository).saveAll(any(List.class)); // Verificar que se guardan las nuevas canciones
+        verify(playlistCancionRepository).saveAll(any(List.class));
     }
 
     @Test
@@ -262,25 +262,23 @@ public class AllControllerTest {
         int nonExistentSongId = 999;
         when(cancionRepository.findById(existingSong.getCancionId())).thenReturn(Optional.of(existingSong));
         when(cancionRepository.findById(nonExistentSongId)).thenReturn(Optional.empty());
-        // Mockear findSongsNotInPlaylist para la recarga de la vista
         when(cancionRepository.findSongsNotInPlaylist(testPlaylist)).thenReturn(songsNotInPlaylist);
 
-        //Act
+        //Act - Corrigiendo el nombre del parámetro
         mockMvc.perform(post("/app1/addSongs")
-                .param("playlistId", String.valueOf(testPlaylist.getPlayListId()))
-                .param("songIds", String.valueOf(existingSong.getCancionId()), String.valueOf(nonExistentSongId))
-                .with(csrf()))
-        //Assert
-                .andExpect(status().isOk()) // Vuelve a la vista de la playlist
+                        .param("playlistId", String.valueOf(testPlaylist.getPlayListId()))
+                        .param("cancionesIds", String.valueOf(existingSong.getCancionId()), String.valueOf(nonExistentSongId))
+                        .with(csrf()))
+                //Assert
+                .andExpect(status().isOk())
                 .andExpect(view().name("app1/viewPlaylist.html"))
                 .andExpect(model().attributeExists("error"))
-                // El mensaje exacto de error dependerá de tu implementación
                 .andExpect(model().attribute("error", "Algunas canciones no se encontraron y no pudieron ser añadidas."))
-                .andExpect(model().attribute("playlist", testPlaylist)) // Asegura que el modelo se recarga
+                .andExpect(model().attribute("playlist", testPlaylist))
                 .andExpect(model().attribute("songsNotInPlaylist", songsNotInPlaylist));
 
-        // Verificar que solo se intentó guardar la canción existente
-        verify(playlistCancionRepository).saveAll(anyList()); // Se llama a saveAll con las canciones válidas
+        // Verificar que saveAll se ejecutó con las canciones válidas
+        verify(playlistCancionRepository).saveAll(anyList());
     }
 
     @Test

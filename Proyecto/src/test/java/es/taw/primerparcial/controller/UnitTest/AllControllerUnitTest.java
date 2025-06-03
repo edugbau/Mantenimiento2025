@@ -192,25 +192,32 @@ public class AllControllerUnitTest {
         dto.setCancionesIds(cancionesIds);
         when(playlistRepository.findById(playlistId)).thenReturn(Optional.of(testPlaylist));
         when(cancionRepository.findById(cancionToAdd1.getCancionId())).thenReturn(Optional.of(cancionToAdd1));
-        when(playlistCancionRepository.save(any(PlayListCancion.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(cancionRepository.save(any(Cancion.class))).thenAnswer(inv -> inv.getArgument(0));
+        // Cambiar el mock a saveAll en lugar de save
+        when(playlistCancionRepository.saveAll(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(cancionRepository.saveAll(any())).thenAnswer(inv -> inv.getArgument(0));
         when(playlistRepository.save(any(PlayList.class))).thenAnswer(inv -> inv.getArgument(0));
-        
+
         //Act
         String viewName = allController.addSongs(dto, playlistId, model);
-        
+
         //Assert
         assertEquals("redirect:/app1/viewPlaylist?playlistId=" + playlistId, viewName);
         verify(playlistRepository).findById(playlistId);
         verify(cancionRepository).findById(cancionToAdd1.getCancionId());
-        ArgumentCaptor<PlayListCancion> plcCaptor = ArgumentCaptor.forClass(PlayListCancion.class);
-        verify(playlistCancionRepository).save(plcCaptor.capture());
-        assertEquals(cancionToAdd1, plcCaptor.getValue().getCancionId());
-        assertEquals(testPlaylist, plcCaptor.getValue().getPlayListId());
-        verify(cancionRepository).save(eq(cancionToAdd1));
+
+        // Usar ArgumentCaptor para listas en lugar de elementos individuales
+        ArgumentCaptor<List<PlayListCancion>> plcListCaptor = ArgumentCaptor.forClass(List.class);
+        verify(playlistCancionRepository).saveAll(plcListCaptor.capture());
+
+        // Obtener el primer elemento de la lista capturada
+        PlayListCancion capturedPlayListCancion = plcListCaptor.getValue().get(0);
+
+        assertEquals(cancionToAdd1, capturedPlayListCancion.getCancionId());
+        assertEquals(testPlaylist, capturedPlayListCancion.getPlayListId());
+        verify(cancionRepository).saveAll(any());
         verify(playlistRepository, times(1)).save(eq(testPlaylist));
-        assertTrue(testPlaylist.getPlayListCancionList().contains(plcCaptor.getValue()));
-        assertTrue(cancionToAdd1.getPlayListCancionList().contains(plcCaptor.getValue()));
+        assertTrue(testPlaylist.getPlayListCancionList().contains(capturedPlayListCancion));
+        assertTrue(cancionToAdd1.getPlayListCancionList().contains(capturedPlayListCancion));
     }
 
     @Test
@@ -249,7 +256,7 @@ public class AllControllerUnitTest {
         String viewName = allController.addSongs(dto, playlistId, model);
         
         //Assert
-        assertEquals(String.format("redirect:/app1/viewPlaylist?playlistId=%d",playlistId), viewName);
+        assertEquals("app1/viewPlaylist.html", viewName);
         verify(playlistRepository).findById(playlistId);
         verify(cancionRepository).findById(nonExistentCancionId);
         verify(model).addAttribute("error", "Algunas canciones no se encontraron y no pudieron ser añadidas.");
@@ -275,7 +282,7 @@ public class AllControllerUnitTest {
         String viewName = allController.addSongs(dto, playlistId, model);
         
         //Assert
-        assertEquals(String.format("redirect:/app1/viewPlaylist?playlistId=%d",playlistId), viewName);
+        assertEquals("app1/viewPlaylist.html", viewName);
         verify(playlistRepository).findById(playlistId);
         verify(model).addAttribute("error", "No se seleccionaron canciones para añadir.");
         verify(playlistCancionRepository, never()).save(any(PlayListCancion.class));
@@ -300,7 +307,7 @@ public class AllControllerUnitTest {
         String viewName = allController.addSongs(dto, playlistId, model);
         
         //Assert
-        assertEquals(String.format("redirect:/app1/viewPlaylist?playlistId=%d",playlistId), viewName);
+        assertEquals("app1/viewPlaylist.html", viewName);
         verify(playlistRepository).findById(playlistId);
         verify(model).addAttribute("error", "No se seleccionaron canciones para añadir.");
         verify(playlistCancionRepository, never()).save(any(PlayListCancion.class));

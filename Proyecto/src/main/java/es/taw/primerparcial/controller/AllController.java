@@ -85,9 +85,13 @@ public class AllController {
             model.addAttribute("playlist", playlist);
             model.addAttribute("songsNotInPlaylist", cancionRepository.findSongsNotInPlaylist(playlist));
             model.addAttribute("dto", new AddSongsObject());
-            return "redirect:/app1/viewPlaylist?playlistId=" + playlist.getPlayListId();
+            // Cambiar esto de redirect a vista directa
+            return "app1/viewPlaylist.html";
         }
+
         boolean notFound = false;
+        List<PlayListCancion> newSongs = new ArrayList<>();
+
         for (Integer cancionId : cancionesIds) {
             var cancionOpt = cancionRepository.findById(cancionId);
             if (cancionOpt.isPresent()) {
@@ -95,30 +99,37 @@ public class AllController {
                 PlayListCancion pc = new PlayListCancion();
                 pc.setCancionId(cancion);
                 pc.setPlayListId(playlist);
-                playlistCancionRepository.save(pc);
+                newSongs.add(pc);  // Acumular para guardar con saveAll
 
                 if (cancion.getPlayListCancionList() == null) {
                     cancion.setPlayListCancionList(new ArrayList<>());
                 }
                 cancion.getPlayListCancionList().add(pc);
-                cancionRepository.save(cancion);
 
                 if (playlist.getPlayListCancionList() == null) {
                     playlist.setPlayListCancionList(new ArrayList<>());
                 }
                 playlist.getPlayListCancionList().add(pc);
-                playlistRepository.save(playlist);
             } else {
                 notFound = true;
             }
         }
+
+        if (!newSongs.isEmpty()) {
+            playlistCancionRepository.saveAll(newSongs);  // Usar saveAll aquí
+            cancionRepository.saveAll(newSongs.stream().map(PlayListCancion::getCancionId).toList());
+            playlistRepository.save(playlist);
+        }
+
         if (notFound) {
             model.addAttribute("error", "Algunas canciones no se encontraron y no pudieron ser añadidas.");
             model.addAttribute("playlist", playlist);
             model.addAttribute("songsNotInPlaylist", cancionRepository.findSongsNotInPlaylist(playlist));
             model.addAttribute("dto", new AddSongsObject());
-            return "redirect:/app1/viewPlaylist?playlistId=" + playlist.getPlayListId();
+            // Cambiar esto de redirect a vista directa
+            return "app1/viewPlaylist.html";
         }
+
         return "redirect:/app1/viewPlaylist?playlistId=" + playlist.getPlayListId();
     }
 }
