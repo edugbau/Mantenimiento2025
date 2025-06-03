@@ -256,4 +256,27 @@ public class AlbumControllerTest {
         verify(cancionRepository, org.mockito.Mockito.never()).findByGenero(any());
         verify(generoRepository, org.mockito.Mockito.never()).findAll();
     }
+
+    @Test
+    @WithMockUser
+    public void testFilter_generoNotFound() throws Exception {
+        // Arrange
+        Integer generoId = 999; // Un ID que no existe
+
+        // Configurar el mock para devolver Optional.empty() cuando se busca este ID
+        when(generoRepository.findById(generoId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        mockMvc.perform(post("/app2/filter")
+                        .param("generoId", String.valueOf(generoId))
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/app2/addAlbum"));
+
+        // Verificar que no se llamaron estos métodos
+        verify(cancionRepository, org.mockito.Mockito.never()).findByGenero(any());
+        verify(generoRepository, org.mockito.Mockito.never()).findAll();
+    }
+
+    
 } 

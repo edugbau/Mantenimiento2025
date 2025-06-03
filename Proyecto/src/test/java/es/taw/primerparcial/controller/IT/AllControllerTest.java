@@ -14,6 +14,7 @@ import es.taw.primerparcial.entity.Cancion;
 import es.taw.primerparcial.entity.PlayListCancion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
@@ -301,5 +304,34 @@ public class AllControllerTest {
                 .andExpect(model().attribute("error", "No se seleccionaron canciones para añadir."))
                 .andExpect(model().attribute("playlist", testPlaylist))
                 .andExpect(model().attribute("songsNotInPlaylist", songsNotInPlaylist));
+    }
+
+    @Test
+    @WithMockUser
+    public void testAddSongs_withNullPlaylistList() throws Exception {
+        // Arrange
+        // Configurar una playlist con PlayListCancionList explícitamente nula
+        testPlaylist.setPlayListCancionList(null);
+        when(playlistRepository.findById(testPlaylist.getPlayListId())).thenReturn(Optional.of(testPlaylist));
+
+        Cancion cancionToAdd = songsNotInPlaylist.get(0);
+        when(cancionRepository.findById(cancionToAdd.getCancionId())).thenReturn(Optional.of(cancionToAdd));
+
+        // Act
+        mockMvc.perform(post("/app1/addSongs")
+                        .param("playlistId", String.valueOf(testPlaylist.getPlayListId()))
+                        .param("cancionesIds", String.valueOf(cancionToAdd.getCancionId()))
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/app1/viewPlaylist?playlistId=" + testPlaylist.getPlayListId()));
+
+        // Assert
+        // Capturar la playlist guardada para verificar que su lista fue inicializada
+        ArgumentCaptor<PlayList> playlistCaptor = ArgumentCaptor.forClass(PlayList.class);
+        verify(playlistRepository).save(playlistCaptor.capture());
+
+        PlayList savedPlaylist = playlistCaptor.getValue();
+        assertNotNull(savedPlaylist.getPlayListCancionList());
+        assertFalse(savedPlaylist.getPlayListCancionList().isEmpty());
     }
 } 
