@@ -12,8 +12,13 @@ public class LoginControllerUnitTest {
     @Test
     @DisplayName("login() debería devolver el nombre de la vista 'login'")
     public void login_invocado_devuelveNombreVistaLogin() {
+        //Arrange
         LoginController controller = new LoginController();
+        
+        //Act
         String viewName = controller.login();
+        
+        //Assert
         assertEquals("login", viewName);
     }
 } 

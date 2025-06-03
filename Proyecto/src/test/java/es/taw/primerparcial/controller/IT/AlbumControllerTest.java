@@ -80,7 +80,12 @@ public class AlbumControllerTest {
 
     @Test
     public void testGetApp2Home_unauthenticated() throws Exception {
+        //Arrange
+        // No se necesita arrange, se prueba el acceso no autenticado.
+
+        //Act
         mockMvc.perform(get("/app2"))
+        //Assert
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("**/login"));
     }
@@ -88,9 +93,12 @@ public class AlbumControllerTest {
     @Test
     @WithMockUser
     public void testGetApp2Home_authenticated() throws Exception {
+        //Arrange
         when(artistaRepository.findAll()).thenReturn(artistaList);
 
+        //Act
         mockMvc.perform(get("/app2"))
+        //Assert
                 .andExpect(status().isOk())
                 .andExpect(view().name("app2/home.html"))
                 .andExpect(model().attributeExists("artistas"))
@@ -99,7 +107,12 @@ public class AlbumControllerTest {
 
     @Test
     public void testGetAddAlbum_unauthenticated() throws Exception {
+        //Arrange
+        // No se necesita arrange, se prueba el acceso no autenticado.
+
+        //Act
         mockMvc.perform(get("/app2/addAlbum"))
+        //Assert
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("**/login"));
     }
@@ -107,10 +120,13 @@ public class AlbumControllerTest {
     @Test
     @WithMockUser
     public void testGetAddAlbum_authenticated() throws Exception {
+        //Arrange
         when(cancionRepository.findAll()).thenReturn(cancionList);
         when(generoRepository.findAll()).thenReturn(generoList);
 
+        //Act
         mockMvc.perform(get("/app2/addAlbum"))
+        //Assert
                 .andExpect(status().isOk())
                 .andExpect(view().name("app2/addAlbum.html"))
                 .andExpect(model().attributeExists("albumRecopilatorio"))
@@ -124,6 +140,7 @@ public class AlbumControllerTest {
     @Test
     @WithMockUser
     public void testSaveAlbum_success() throws Exception {
+        //Arrange
         String albumName = "Nuevo Album Recopilatorio";
         Cancion cancionOriginal1 = new Cancion();
         cancionOriginal1.setCancionId(101);
@@ -154,11 +171,13 @@ public class AlbumControllerTest {
             return c;
         });
 
+        //Act
         mockMvc.perform(post("/app2/saveAlbum")
                 .param("albumRecopilatorioName", albumName)
                 .param("canciones[0]", "101") // IDs de las canciones a incluir
                 .param("canciones[1]", "102")
                 .with(csrf()))
+        //Assert
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/app2/"));
 
@@ -168,26 +187,29 @@ public class AlbumControllerTest {
         // El número exacto de llamadas a cancionRepository.save y artistaRepository.save puede variar
         // según la lógica de asociación de artistas de las canciones originales.
         // Por simplicidad, verificamos que se llamen al menos las veces esperadas para las nuevas canciones.
-        verify(cancionRepository, org.mockito.Mockito.atLeast(2)).save(any(Cancion.class)); 
+        verify(cancionRepository, org.mockito.Mockito.atLeast(2)).save(any(Cancion.class));
     }
 
     @Test
     @WithMockUser
     public void testFilter_withGenero() throws Exception {
+        //Arrange
         Genero generoToFilterBy = generoList.get(0); // Genero con ID 1
         List<Cancion> filteredCanciones = new ArrayList<>(cancionList);
 
-        // Esta es la parte crucial: cuando Spring intente convertir el parámetro "genero=1" 
-        // a un objeto Genero, usará el converter registrado. Si el converter por defecto 
+        // Esta es la parte crucial: cuando Spring intente convertir el parámetro "genero=1"
+        // a un objeto Genero, usará el converter registrado. Si el converter por defecto
         // (o uno personalizado) usa findById, este mock lo cubrirá.
         when(generoRepository.findById(generoToFilterBy.getGeneroId())).thenReturn(Optional.of(generoToFilterBy));
 
         when(cancionRepository.findByGenero(generoToFilterBy)).thenReturn(filteredCanciones);
         when(generoRepository.findAll()).thenReturn(generoList); // Para rellenar el modelo
 
+        //Act
         mockMvc.perform(post("/app2/filter")
                 .param("genero", String.valueOf(generoToFilterBy.getGeneroId())) // Enviar el ID del género
                 .with(csrf()))
+        //Assert
                 .andExpect(status().isOk())
                 .andExpect(view().name("app2/addAlbum.html"))
                 .andExpect(model().attributeExists("albumRecopilatorio"))
@@ -202,10 +224,23 @@ public class AlbumControllerTest {
     @Test
     @WithMockUser
     public void testFilter_withoutGenero() throws Exception {
-        // No se envía el parámetro "genero", por lo que el objeto Genero en el controlador será null.
+        //Arrange
+        when(cancionRepository.findAll()).thenReturn(cancionList); // Devuelve todas las canciones si no hay filtro
+        when(generoRepository.findAll()).thenReturn(generoList); // Para rellenar el modelo
+
+        //Act
         mockMvc.perform(post("/app2/filter")
+                // No se envía el parámetro "genero"
                 .with(csrf()))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/app2/addAlbum"));
+        //Assert
+                .andExpect(status().isOk())
+                .andExpect(view().name("app2/addAlbum.html"))
+                .andExpect(model().attributeExists("albumRecopilatorio"))
+                .andExpect(model().attributeExists("canciones"))
+                .andExpect(model().attribute("canciones", cancionList)) // Espera todas las canciones
+                .andExpect(model().attributeExists("generos"))
+                .andExpect(model().attribute("generos", generoList));
+        
+        verify(cancionRepository).findAll(); // Verifica que se llamo a findAll ya que no hubo filtro por genero
     }
 } 

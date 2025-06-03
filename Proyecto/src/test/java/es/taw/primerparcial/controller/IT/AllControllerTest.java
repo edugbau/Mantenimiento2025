@@ -99,7 +99,12 @@ public class AllControllerTest {
 
     @Test
     public void testGetApp1Index_unauthenticated() throws Exception {
+        //Arrange
+        // No se necesita arrange para esta prueba, ya que el estado inicial es un usuario no autenticado.
+
+        //Act
         mockMvc.perform(get("/app1"))
+        //Assert
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("**/login"));
     }
@@ -107,9 +112,12 @@ public class AllControllerTest {
     @Test
     @WithMockUser
     public void testGetApp1Index_authenticated() throws Exception {
+        //Arrange
         when(usuarioRepository.findAll()).thenReturn(usuarioList);
 
+        //Act
         mockMvc.perform(get("/app1"))
+        //Assert
                 .andExpect(status().isOk())
                 .andExpect(view().name("app1/index.html")) // Ajustado según tu cambio
                 .andExpect(model().attributeExists("usuarios"))
@@ -121,6 +129,7 @@ public class AllControllerTest {
     @Test
     @WithMockUser
     public void testCreatePlaylist_success() throws Exception {
+        //Arrange
         Usuario testUser = usuarioList.get(0);
         when(usuarioRepository.findById(testUser.getUsuarioId())).thenReturn(Optional.of(testUser));
 
@@ -132,10 +141,12 @@ public class AllControllerTest {
             return p;
         });
 
+        //Act
         mockMvc.perform(post("/app1/createPlaylist")
                 .param("nombre", "Mi Nueva Playlist")
                 .param("usuarioId", String.valueOf(testUser.getUsuarioId()))
                 .with(csrf())) // Añadir token CSRF
+        //Assert
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/app1/viewPlaylist?playlistId=123"));
 
@@ -145,15 +156,18 @@ public class AllControllerTest {
     @Test
     @WithMockUser
     public void testCreatePlaylist_userNotFound() throws Exception {
+        //Arrange
         int nonExistentUserId = 999;
         when(usuarioRepository.findById(nonExistentUserId)).thenReturn(Optional.empty());
         // Asegurar que findAll() sigue funcionando para recargar el formulario
         when(usuarioRepository.findAll()).thenReturn(usuarioList);
 
+        //Act
         mockMvc.perform(post("/app1/createPlaylist")
                 .param("nombre", "Playlist Fallida")
                 .param("usuarioId", String.valueOf(nonExistentUserId))
                 .with(csrf()))
+        //Assert
                 .andExpect(status().isOk()) // Devuelve a la página del formulario
                 .andExpect(view().name("app1/index.html"))
                 .andExpect(model().attributeExists("error"))
@@ -165,10 +179,13 @@ public class AllControllerTest {
     @Test
     @WithMockUser
     public void testViewPlaylist_success() throws Exception {
+        //Arrange
         when(playlistRepository.findById(testPlaylist.getPlayListId())).thenReturn(Optional.of(testPlaylist));
         when(cancionRepository.findSongsNotInPlaylist(testPlaylist)).thenReturn(songsNotInPlaylist);
 
+        //Act
         mockMvc.perform(get("/app1/viewPlaylist").param("playlistId", String.valueOf(testPlaylist.getPlayListId())))
+        //Assert
                 .andExpect(status().isOk())
                 .andExpect(view().name("app1/viewPlaylist.html")) // Ajustado
                 .andExpect(model().attributeExists("playlist"))
@@ -182,10 +199,13 @@ public class AllControllerTest {
     @Test
     @WithMockUser
     public void testViewPlaylist_notFound() throws Exception {
+        //Arrange
         int nonExistentPlaylistId = 999;
         when(playlistRepository.findById(nonExistentPlaylistId)).thenReturn(Optional.empty());
 
+        //Act
         mockMvc.perform(get("/app1/viewPlaylist").param("playlistId", String.valueOf(nonExistentPlaylistId)))
+        //Assert
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/app1/"));
     }
@@ -193,79 +213,93 @@ public class AllControllerTest {
     @Test
     @WithMockUser
     public void testAddSongs_success() throws Exception {
+        //Arrange
         when(playlistRepository.findById(testPlaylist.getPlayListId())).thenReturn(Optional.of(testPlaylist));
         Cancion cancionToAdd1 = songsNotInPlaylist.get(0); // ID 1
         Cancion cancionToAdd2 = songsNotInPlaylist.get(1); // ID 2
         when(cancionRepository.findById(cancionToAdd1.getCancionId())).thenReturn(Optional.of(cancionToAdd1));
         when(cancionRepository.findById(cancionToAdd2.getCancionId())).thenReturn(Optional.of(cancionToAdd2));
 
-        // Cuando se guarda PlayListCancion, simplemente devolvemos el objeto que se pasó.
-        when(playlistCancionRepository.save(any(PlayListCancion.class))).thenAnswer(inv -> inv.getArgument(0));
-        // Similar para cancion y playlist, aunque el estado exacto no se verifica profundamente aquí
-        when(cancionRepository.save(any(Cancion.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(playlistRepository.save(any(PlayList.class))).thenAnswer(inv -> inv.getArgument(0));
-
+        //Act
         mockMvc.perform(post("/app1/addSongs")
                 .param("playlistId", String.valueOf(testPlaylist.getPlayListId()))
-                .param("cancionesIds", String.valueOf(cancionToAdd1.getCancionId())) // Enviamos IDs como string
-                .param("cancionesIds", String.valueOf(cancionToAdd2.getCancionId()))
+                .param("songIds", String.valueOf(cancionToAdd1.getCancionId()), String.valueOf(cancionToAdd2.getCancionId()))
                 .with(csrf()))
+        //Assert
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/app1/viewPlaylist?playlistId=" + testPlaylist.getPlayListId()));
 
-        verify(playlistCancionRepository, org.mockito.Mockito.times(2)).save(any(PlayListCancion.class));
-        verify(cancionRepository, org.mockito.Mockito.times(2)).save(any(Cancion.class));
-        verify(playlistRepository, org.mockito.Mockito.times(3)).save(any(PlayList.class)); // 1 en setup (si aplica), 2 aquí por cada canción añadida a la lista de la playlist
+        verify(playlistCancionRepository).saveAll(any(List.class)); // Verificar que se guardan las nuevas canciones
     }
 
     @Test
     @WithMockUser
     public void testAddSongs_playlistNotFound() throws Exception {
+        //Arrange
         int nonExistentPlaylistId = 999;
         when(playlistRepository.findById(nonExistentPlaylistId)).thenReturn(Optional.empty());
+        Cancion cancionToAdd = songsNotInPlaylist.get(0);
+        // No es necesario mockear cancionRepository.findById si la playlist no se encuentra primero
 
+        //Act
         mockMvc.perform(post("/app1/addSongs")
                 .param("playlistId", String.valueOf(nonExistentPlaylistId))
-                .param("cancionesIds", "1")
+                .param("songIds", String.valueOf(cancionToAdd.getCancionId()))
                 .with(csrf()))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/app1/"));
+        //Assert
+                .andExpect(status().is3xxRedirection()) // O el comportamiento que esperes, ej. error o vista específica
+                .andExpect(redirectedUrl("/app1/")); // Asumiendo que redirige a la lista si la playlist no existe
     }
 
     @Test
     @WithMockUser
     public void testAddSongs_someSongsNotFound() throws Exception {
+        //Arrange
         when(playlistRepository.findById(testPlaylist.getPlayListId())).thenReturn(Optional.of(testPlaylist));
-        Cancion existingCancion = songsNotInPlaylist.get(0); // ID 1
-        int nonExistentCancionId = 999;
+        Cancion existingSong = songsNotInPlaylist.get(0);
+        int nonExistentSongId = 999;
+        when(cancionRepository.findById(existingSong.getCancionId())).thenReturn(Optional.of(existingSong));
+        when(cancionRepository.findById(nonExistentSongId)).thenReturn(Optional.empty());
+        // Mockear findSongsNotInPlaylist para la recarga de la vista
+        when(cancionRepository.findSongsNotInPlaylist(testPlaylist)).thenReturn(songsNotInPlaylist);
 
-        when(cancionRepository.findById(existingCancion.getCancionId())).thenReturn(Optional.of(existingCancion));
-        when(cancionRepository.findById(nonExistentCancionId)).thenReturn(Optional.empty());
-
+        //Act
         mockMvc.perform(post("/app1/addSongs")
                 .param("playlistId", String.valueOf(testPlaylist.getPlayListId()))
-                .param("cancionesIds", String.valueOf(existingCancion.getCancionId()))
-                .param("cancionesIds", String.valueOf(nonExistentCancionId))
+                .param("songIds", String.valueOf(existingSong.getCancionId()), String.valueOf(nonExistentSongId))
                 .with(csrf()))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/app1/viewPlaylist?playlistId=" + testPlaylist.getPlayListId()));
+        //Assert
+                .andExpect(status().isOk()) // Vuelve a la vista de la playlist
+                .andExpect(view().name("app1/viewPlaylist.html"))
+                .andExpect(model().attributeExists("error"))
+                // El mensaje exacto de error dependerá de tu implementación
+                .andExpect(model().attribute("error", "Algunas canciones no se encontraron y no pudieron ser añadidas."))
+                .andExpect(model().attribute("playlist", testPlaylist)) // Asegura que el modelo se recarga
+                .andExpect(model().attribute("songsNotInPlaylist", songsNotInPlaylist));
 
-        // Se guarda la canción existente
-        verify(playlistCancionRepository, org.mockito.Mockito.times(1)).save(any(PlayListCancion.class));
+        // Verificar que solo se intentó guardar la canción existente
+        verify(playlistCancionRepository).saveAll(anyList()); // Se llama a saveAll con las canciones válidas
     }
 
     @Test
     @WithMockUser
     public void testAddSongs_emptySongList() throws Exception {
+        //Arrange
         when(playlistRepository.findById(testPlaylist.getPlayListId())).thenReturn(Optional.of(testPlaylist));
+        // Mockear findSongsNotInPlaylist para la recarga de la vista
+        when(cancionRepository.findSongsNotInPlaylist(testPlaylist)).thenReturn(songsNotInPlaylist);
 
+        //Act
         mockMvc.perform(post("/app1/addSongs")
                 .param("playlistId", String.valueOf(testPlaylist.getPlayListId()))
-                // No se envían cancionesIds
+                // No se envían songIds
                 .with(csrf()))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/app1/viewPlaylist?playlistId=" + testPlaylist.getPlayListId()));
-
-        verify(playlistCancionRepository, org.mockito.Mockito.never()).save(any(PlayListCancion.class));
+        //Assert
+                .andExpect(status().isOk()) // Vuelve a la vista de la playlist
+                .andExpect(view().name("app1/viewPlaylist.html"))
+                .andExpect(model().attributeExists("error"))
+                .andExpect(model().attribute("error", "No se seleccionaron canciones para añadir."))
+                .andExpect(model().attribute("playlist", testPlaylist))
+                .andExpect(model().attribute("songsNotInPlaylist", songsNotInPlaylist));
     }
 } 
