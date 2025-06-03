@@ -78,8 +78,13 @@ public class AllControllerUnitTest {
     @Test
     @DisplayName("index() debería devolver vista 'app1/index.html' y añadir atributos al modelo")
     void index_invocado_devuelveVistaYAtributosModelo() {
+        //Arrange
         when(usuarioRepository.findAll()).thenReturn(usuarioList);
+        
+        //Act
         String viewName = allController.index(model);
+        
+        //Assert
         assertEquals("app1/index.html", viewName);
         verify(usuarioRepository).findAll();
         verify(model).addAttribute("usuarios", usuarioList);
@@ -89,6 +94,7 @@ public class AllControllerUnitTest {
     @Test
     @DisplayName("createPlaylist() con usuario válido debería redirigir a viewPlaylist")
     void createPlaylist_usuarioValido_redirigeAViewPlaylist() {
+        //Arrange
         CreatePlaylistObject dto = new CreatePlaylistObject();
         dto.setNombre("Mi Nueva Playlist U");
         dto.setUsuarioId(1);
@@ -100,7 +106,11 @@ public class AllControllerUnitTest {
             p.setPlayListId(123);
             return p;
         });
+        
+        //Act
         String viewName = allController.createPlaylist(dto, model);
+        
+        //Assert
         assertEquals("redirect:/app1/viewPlaylist?playlistId=123", viewName);
         verify(usuarioRepository).findById(1);
         verify(playlistRepository).save(any(PlayList.class));
@@ -108,19 +118,24 @@ public class AllControllerUnitTest {
         assertEquals("Mi Nueva Playlist U", savedPlaylist.getPlayListName());
         assertEquals(testUser, savedPlaylist.getUsuarioId());
         long timeDiff = new Date().getTime() - savedPlaylist.getDateCreation().getTime();
-        assertTrue(timeDiff < 1000, "La fecha de creación debería ser reciente."); 
+        assertTrue(timeDiff < 1000, "La fecha de creación debería ser reciente.");
     }
 
     @Test
     @DisplayName("createPlaylist() con usuario inexistente debería devolver vista 'app1/index.html' con error")
     void createPlaylist_usuarioNoEncontrado_devuelveVistaIndexConError() {
+        //Arrange
         CreatePlaylistObject dto = new CreatePlaylistObject();
         dto.setNombre("Playlist Fallida U");
         dto.setUsuarioId(999);
         when(usuarioRepository.findById(999)).thenReturn(Optional.empty());
         when(usuarioRepository.findAll()).thenReturn(usuarioList);
+        
+        //Act
         String viewName = allController.createPlaylist(dto, model);
-        assertEquals("app1/index.html", viewName); 
+        
+        //Assert
+        assertEquals("app1/index.html", viewName);
         verify(usuarioRepository).findById(999);
         verify(model).addAttribute("error", "Usuario no encontrado.");
         verify(model).addAttribute("usuarios", usuarioList);
@@ -131,10 +146,15 @@ public class AllControllerUnitTest {
     @Test
     @DisplayName("viewPlaylist() con playlist existente debería devolver vista 'app1/viewPlaylist.html' y atributos")
     void viewPlaylist_playlistExiste_devuelveVistaYAtributosModelo() {
+        //Arrange
         Integer playlistId = testPlaylist.getPlayListId();
         when(playlistRepository.findById(playlistId)).thenReturn(Optional.of(testPlaylist));
         when(cancionRepository.findSongsNotInPlaylist(testPlaylist)).thenReturn(songsNotInPlaylist);
+        
+        //Act
         String viewName = allController.viewPlaylist(playlistId, model);
+        
+        //Assert
         assertEquals("app1/viewPlaylist.html", viewName);
         verify(playlistRepository).findById(playlistId);
         verify(cancionRepository).findSongsNotInPlaylist(testPlaylist);
@@ -146,9 +166,14 @@ public class AllControllerUnitTest {
     @Test
     @DisplayName("viewPlaylist() con playlist inexistente debería redirigir a '/app1/'")
     void viewPlaylist_playlistNoEncontrada_redirigeARaizApp1() {
+        //Arrange
         Integer playlistId = 999;
         when(playlistRepository.findById(playlistId)).thenReturn(Optional.empty());
+        
+        //Act
         String viewName = allController.viewPlaylist(playlistId, model);
+        
+        //Assert
         assertEquals("redirect:/app1/", viewName);
         verify(playlistRepository).findById(playlistId);
         verify(cancionRepository, never()).findSongsNotInPlaylist(any(PlayList.class));
@@ -158,6 +183,7 @@ public class AllControllerUnitTest {
     @Test
     @DisplayName("addSongs() con playlist y canciones válidas debería redirigir a viewPlaylist")
     void addSongs_playlistYCancionesValidas_redirigeAViewPlaylist() {
+        //Arrange
         Integer playlistId = testPlaylist.getPlayListId();
         AddSongsObject dto = new AddSongsObject();
         List<Integer> cancionesIds = new ArrayList<>();
@@ -169,7 +195,11 @@ public class AllControllerUnitTest {
         when(playlistCancionRepository.save(any(PlayListCancion.class))).thenAnswer(inv -> inv.getArgument(0));
         when(cancionRepository.save(any(Cancion.class))).thenAnswer(inv -> inv.getArgument(0));
         when(playlistRepository.save(any(PlayList.class))).thenAnswer(inv -> inv.getArgument(0));
+        
+        //Act
         String viewName = allController.addSongs(dto, playlistId, model);
+        
+        //Assert
         assertEquals("redirect:/app1/viewPlaylist?playlistId=" + playlistId, viewName);
         verify(playlistRepository).findById(playlistId);
         verify(cancionRepository).findById(cancionToAdd1.getCancionId());
@@ -186,11 +216,16 @@ public class AllControllerUnitTest {
     @Test
     @DisplayName("addSongs() con playlist inexistente debería redirigir a '/app1/'")
     void addSongs_playlistNoEncontrada_redirigeARaizApp1() {
+        //Arrange
         Integer playlistId = 999;
         AddSongsObject dto = new AddSongsObject();
         dto.setCancionesIds(List.of(100));
         when(playlistRepository.findById(playlistId)).thenReturn(Optional.empty());
+        
+        //Act
         String viewName = allController.addSongs(dto, playlistId, model);
+        
+        //Assert
         assertEquals("redirect:/app1/", viewName);
         verify(playlistRepository).findById(playlistId);
         verify(cancionRepository, never()).findById(anyInt());
@@ -198,47 +233,81 @@ public class AllControllerUnitTest {
     }
 
     @Test
-    @DisplayName("addSongs() con canción inexistente debería redirigir a viewPlaylist y no guardar")
+    @DisplayName("addSongs() con canción inexistente debería redirigir a viewPlaylist y no guardar la canción")
     void addSongs_cancionNoEncontrada_redirigeAViewPlaylistYNoGuarda() {
+        //Arrange
         Integer playlistId = testPlaylist.getPlayListId();
         AddSongsObject dto = new AddSongsObject();
-        Integer nonExistentCancionId = 777;
+        Integer nonExistentCancionId = 999;
         dto.setCancionesIds(List.of(nonExistentCancionId));
         when(playlistRepository.findById(playlistId)).thenReturn(Optional.of(testPlaylist));
         when(cancionRepository.findById(nonExistentCancionId)).thenReturn(Optional.empty());
+        // Necesario para la recarga de la vista en caso de error
+        when(cancionRepository.findSongsNotInPlaylist(testPlaylist)).thenReturn(songsNotInPlaylist);
+        
+        //Act
         String viewName = allController.addSongs(dto, playlistId, model);
-        assertEquals("redirect:/app1/viewPlaylist?playlistId=" + playlistId, viewName);
+        
+        //Assert
+        assertEquals("app1/viewPlaylist.html", viewName); // Se queda en la misma página para mostrar error
         verify(playlistRepository).findById(playlistId);
         verify(cancionRepository).findById(nonExistentCancionId);
+        verify(model).addAttribute("error", "Algunas canciones no se encontraron y no pudieron ser añadidas.");
         verify(playlistCancionRepository, never()).save(any(PlayListCancion.class));
+        // Verifica que el modelo se recarga correctamente para la vista
+        verify(model).addAttribute("playlist", testPlaylist);
+        verify(model).addAttribute("songsNotInPlaylist", songsNotInPlaylist);
+        verify(model).addAttribute(eq("dto"), any(AddSongsObject.class));
     }
 
     @Test
     @DisplayName("addSongs() con lista de canciones vacía debería redirigir a viewPlaylist y no guardar")
     void addSongs_listaCancionesVacia_redirigeAViewPlaylistYNoGuarda() {
+        //Arrange
         Integer playlistId = testPlaylist.getPlayListId();
         AddSongsObject dto = new AddSongsObject();
-        dto.setCancionesIds(new ArrayList<>());
+        dto.setCancionesIds(new ArrayList<>()); // Lista vacía
         when(playlistRepository.findById(playlistId)).thenReturn(Optional.of(testPlaylist));
+        // Necesario para la recarga de la vista en caso de error o no acción
+        when(cancionRepository.findSongsNotInPlaylist(testPlaylist)).thenReturn(songsNotInPlaylist);
+        
+        //Act
         String viewName = allController.addSongs(dto, playlistId, model);
-        assertEquals("redirect:/app1/viewPlaylist?playlistId=" + playlistId, viewName);
+        
+        //Assert
+        assertEquals("app1/viewPlaylist.html", viewName); // Se queda en la misma página
         verify(playlistRepository).findById(playlistId);
-        verify(cancionRepository, never()).findById(anyInt());
+        verify(model).addAttribute("error", "No se seleccionaron canciones para añadir.");
         verify(playlistCancionRepository, never()).save(any(PlayListCancion.class));
+        // Verifica que el modelo se recarga correctamente para la vista
+        verify(model).addAttribute("playlist", testPlaylist);
+        verify(model).addAttribute("songsNotInPlaylist", songsNotInPlaylist);
+        verify(model).addAttribute(eq("dto"), any(AddSongsObject.class));
     }
 
     @Test
     @DisplayName("addSongs() con lista de canciones nula debería redirigir a viewPlaylist y no guardar")
     void addSongs_listaCancionesNula_redirigeAViewPlaylistYNoGuarda() {
+        //Arrange
         Integer playlistId = testPlaylist.getPlayListId();
         AddSongsObject dto = new AddSongsObject();
-        dto.setCancionesIds(null);
+        dto.setCancionesIds(null); // Lista nula
         when(playlistRepository.findById(playlistId)).thenReturn(Optional.of(testPlaylist));
+        // Necesario para la recarga de la vista en caso de error o no acción
+        when(cancionRepository.findSongsNotInPlaylist(testPlaylist)).thenReturn(songsNotInPlaylist);
+        
+        //Act
         String viewName = allController.addSongs(dto, playlistId, model);
-        assertEquals("redirect:/app1/viewPlaylist?playlistId=" + playlistId, viewName);
+        
+        //Assert
+        assertEquals("app1/viewPlaylist.html", viewName); // Se queda en la misma página
         verify(playlistRepository).findById(playlistId);
-        verify(cancionRepository, never()).findById(anyInt());
+        verify(model).addAttribute("error", "No se seleccionaron canciones para añadir.");
         verify(playlistCancionRepository, never()).save(any(PlayListCancion.class));
+        // Verifica que el modelo se recarga correctamente para la vista
+        verify(model).addAttribute("playlist", testPlaylist);
+        verify(model).addAttribute("songsNotInPlaylist", songsNotInPlaylist);
+        verify(model).addAttribute(eq("dto"), any(AddSongsObject.class));
     }
 
     // Más pruebas unitarias para AllController aquí -> Ya no, están todas :)

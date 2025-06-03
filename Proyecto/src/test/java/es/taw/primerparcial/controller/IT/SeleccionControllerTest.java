@@ -27,9 +27,12 @@ public class SeleccionControllerTest {
 
     @Test
     public void testGetSeleccionPage_unauthenticated() throws Exception {
+
+        //Act
         // Cuando un usuario no autenticado intenta acceder a /seleccion
         // Spring Security debería redirigirlo a la página de login.
         mockMvc.perform(get("/seleccion"))
+        //Assert
                 .andExpect(status().is3xxRedirection()) // Espera una redirección (e.g., 302 Found)
                 .andExpect(redirectedUrlPattern("**/login")); // Espera que redirija a la URL de login
     }
@@ -37,7 +40,9 @@ public class SeleccionControllerTest {
     @Test
     @WithMockUser // Simula un usuario autenticado. Por defecto, usuario "user", contraseña "password", rol "USER"
     public void testGetSeleccionPage_authenticated() throws Exception {
+        //Act
         mockMvc.perform(get("/seleccion"))
+        //Assert
                 .andExpect(status().isOk())
                 .andExpect(view().name("seleccion"));
     }

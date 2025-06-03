@@ -11,8 +11,13 @@ public class SeleccionControllerUnitTest {
     @Test
     @DisplayName("seleccion() debería devolver el nombre de la vista 'seleccion'")
     public void seleccion_invocado_devuelveNombreVistaSeleccion() {
+        //Arrange
         SeleccionController controller = new SeleccionController();
+        
+        //Act
         String viewName = controller.seleccion();
+        
+        //Assert
         assertEquals("seleccion", viewName);
     }
 } 

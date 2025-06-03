@@ -20,7 +20,12 @@ public class LoginControllerTest {
 
     @Test
     public void testGetLoginPage() throws Exception {
+        //Arrange
+        // No se necesita "arrange" para esta prueba, ya que solo se verifica el acceso a la página de login.
+
+        //Act
         mockMvc.perform(get("/login"))
+        //Assert
                 .andExpect(status().isOk()) // Esperamos un 200 OK ya que /login está permitido
                 .andExpect(view().name("login"));
     }
