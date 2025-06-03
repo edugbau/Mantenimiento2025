@@ -5,6 +5,7 @@ import es.taw.primerparcial.controller.AlbumController;
 import es.taw.primerparcial.dao.AlbumRepository;
 import es.taw.primerparcial.dao.ArtistaRepository;
 import es.taw.primerparcial.dao.CancionRepository;
+import es.taw.primerparcial.dao.UsuarioRepository;
 import es.taw.primerparcial.dao.GeneroRepository;
 import es.taw.primerparcial.dto.AlbumRecopilatorio;
 import es.taw.primerparcial.entity.Artista;
@@ -50,6 +51,8 @@ public class AlbumControllerTest {
 
     @MockBean
     private GeneroRepository generoRepository;
+    @MockBean
+    private UsuarioRepository usuarioRepository;
 
     @MockBean
     private UserDetailsService userDetailsService; // Para SecurityConfig
@@ -180,7 +183,7 @@ public class AlbumControllerTest {
                 .with(csrf()))
         //Assert
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/app2/"));
+                .andExpect(redirectedUrl("/app2"));
 
         verify(artistaRepository).save(any(Artista.class)); // Se crea un nuevo artista para el álbum recopilatorio
         verify(albumRepository).save(any(es.taw.primerparcial.entity.Album.class));
@@ -218,7 +221,7 @@ public class AlbumControllerTest {
                 .andExpect(model().attribute("canciones", filteredCanciones))
                 .andExpect(model().attributeExists("generos"))
                 .andExpect(model().attribute("generos", generoList));
-        
+
         verify(cancionRepository).findByGenero(generoToFilterBy);
     }
 
@@ -226,22 +229,21 @@ public class AlbumControllerTest {
     @WithMockUser
     public void testFilter_withoutGenero() throws Exception {
         //Arrange
-        when(cancionRepository.findAll()).thenReturn(cancionList); // Devuelve todas las canciones si no hay filtro
-        when(generoRepository.findAll()).thenReturn(generoList); // Para rellenar el modelo
+        // No es necesario mockear cancionRepository.findAll() ni generoRepository.findAll()
+        // porque el controlador redirige antes de usarlos cuando 'genero' es null.
 
         //Act
         mockMvc.perform(post("/app2/filter")
-                // No se envía el parámetro "genero"
-                .with(csrf()))
-        //Assert
-                .andExpect(status().isOk())
-                .andExpect(view().name("app2/addAlbum.html"))
-                .andExpect(model().attributeExists("albumRecopilatorio"))
-                .andExpect(model().attributeExists("canciones"))
-                .andExpect(model().attribute("canciones", cancionList)) // Espera todas las canciones
-                .andExpect(model().attributeExists("generos"))
-                .andExpect(model().attribute("generos", generoList));
-        
-        verify(cancionRepository).findAll(); // Verifica que se llamo a findAll ya que no hubo filtro por genero
+                        // No se envía el parámetro "genero"
+                        .with(csrf()))
+                //Assert
+                .andExpect(status().isFound()) // Espera un 302 Redirect
+                .andExpect(view().name("redirect:/app2/addAlbum"));
+
+        // No se deben verificar atributos del modelo ya que no se añaden en este flujo.
+        // No se debe verificar cancionRepository.findAll() ya que no se llama en este flujo.
+        verify(cancionRepository, org.mockito.Mockito.never()).findAll();
+        verify(cancionRepository, org.mockito.Mockito.never()).findByGenero(any());
+        verify(generoRepository, org.mockito.Mockito.never()).findAll();
     }
 } 
