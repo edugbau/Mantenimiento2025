@@ -1,12 +1,19 @@
 ----------------------------------------------------------------
+<<<<<<< Updated upstream
 Wed Jun 04 14:49:54 CEST 2025:
 Booting Derby version The Apache Software Foundation - Apache Derby - 10.16.1.1 - (1901046): instance a816c00e-0197-3afd-ad07-000001d60280 
 on database directory C:\Users\juanm\Desktop\workflow\Mantenimiento2025\Proyecto\bd with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@5a07e868 
 Loaded from file:/C:/Users/juanm/.m2/repository/org/apache/derby/derby/10.16.1.1/derby-10.16.1.1.jar
+=======
+Wed Jun 04 14:22:05 CEST 2025:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.16.1.1 - (1901046): instance a816c00e-0197-3ae4-38f9-00000162cfa0 
+on database directory C:\Users\Eduardo\Desktop\universidad\Mantenimiento\Mantenimiento2025_repo\Mantenimiento2025\Proyecto\bd with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@4d7e1886 
+Loaded from file:/C:/Users/Eduardo/.m2/repository/org/apache/derby/derby/10.16.1.1/derby-10.16.1.1.jar
+>>>>>>> Stashed changes
 java.vendor=Oracle Corporation
-java.runtime.version=23.0.2+7-58
-user.dir=C:\Users\juanm\Desktop\workflow\Mantenimiento2025\Proyecto
-os.name=Windows 10
+java.runtime.version=19.0.2+7-44
+user.dir=C:\Users\Eduardo\Desktop\universidad\Mantenimiento\Mantenimiento2025_repo\Mantenimiento2025\Proyecto
+os.name=Windows 11
 os.arch=amd64
 os.version=10.0
 derby.system.home=null
