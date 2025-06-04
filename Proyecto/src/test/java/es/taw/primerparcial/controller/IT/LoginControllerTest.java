@@ -30,4 +30,10 @@ public class LoginControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("login"));
     }
+    @Test
+    public void testGetLoginDosPage() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"));
+    }
 }

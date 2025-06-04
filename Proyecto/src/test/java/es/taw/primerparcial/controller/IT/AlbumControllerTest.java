@@ -278,5 +278,82 @@ public class AlbumControllerTest {
         verify(generoRepository, org.mockito.Mockito.never()).findAll();
     }
 
-    
+    @Test
+    @WithMockUser
+    public void testSaveAlbum_withCancionWithoutAlbum() throws Exception {
+        // Arrange - Crear una canción sin álbum asignado
+        String albumName = "Álbum Recopilatorio Test";
+
+        Cancion cancionSinAlbum = new Cancion();
+        cancionSinAlbum.setCancionId(201);
+        cancionSinAlbum.setCancionName("Canción Sin Álbum");
+        cancionSinAlbum.setAlbumId(null); // Explícitamente null
+        cancionSinAlbum.setArtistaList(new ArrayList<>());
+
+        when(cancionRepository.findById(201)).thenReturn(Optional.of(cancionSinAlbum));
+
+        // Simular guardado
+        when(artistaRepository.save(any(Artista.class))).thenAnswer(i -> i.getArgument(0));
+        when(albumRepository.save(any(es.taw.primerparcial.entity.Album.class))).thenAnswer(i -> i.getArgument(0));
+        when(cancionRepository.save(any(Cancion.class))).thenAnswer(i -> i.getArgument(0));
+
+        // Act
+        mockMvc.perform(post("/app2/saveAlbum")
+                        .param("albumRecopilatorioName", albumName)
+                        .param("canciones", "201")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/app2"));
+
+        // Assert - Verificar que no se intenta acceder a artista desde un álbum nulo
+        // Debería crear una canción nueva sin error por el álbum nulo
+        verify(artistaRepository).save(any(Artista.class)); // Nuevo artista para el álbum
+        verify(albumRepository).save(any(es.taw.primerparcial.entity.Album.class)); // Nuevo álbum
+        verify(cancionRepository).save(any(Cancion.class)); // Nueva canción
+
+        // Importante: NO se debe haber llamado a artistaRepository.save más de una vez
+        // (solo para el nuevo artista del álbum, no para artistas asociados a la canción original)
+        verify(artistaRepository, org.mockito.Mockito.times(1)).save(any(Artista.class));
+    }
+
+    @Test
+    @WithMockUser
+    public void testSaveAlbum_withAlbumWithoutArtista() throws Exception {
+        // Arrange - Crear una canción con álbum pero sin artista en el álbum
+        String albumName = "Álbum Recopilatorio Test";
+
+        es.taw.primerparcial.entity.Album albumSinArtista = new es.taw.primerparcial.entity.Album();
+        albumSinArtista.setAlbumId(301);
+        albumSinArtista.setAlbumName("Álbum Sin Artista");
+        albumSinArtista.setArtistaId(null); // Explícitamente null
+
+        Cancion cancionConAlbumSinArtista = new Cancion();
+        cancionConAlbumSinArtista.setCancionId(301);
+        cancionConAlbumSinArtista.setCancionName("Canción Con Álbum Sin Artista");
+        cancionConAlbumSinArtista.setAlbumId(albumSinArtista);
+        cancionConAlbumSinArtista.setArtistaList(new ArrayList<>());
+
+        when(cancionRepository.findById(301)).thenReturn(Optional.of(cancionConAlbumSinArtista));
+
+        // Simular guardado
+        when(artistaRepository.save(any(Artista.class))).thenAnswer(i -> i.getArgument(0));
+        when(albumRepository.save(any(es.taw.primerparcial.entity.Album.class))).thenAnswer(i -> i.getArgument(0));
+        when(cancionRepository.save(any(Cancion.class))).thenAnswer(i -> i.getArgument(0));
+
+        // Act
+        mockMvc.perform(post("/app2/saveAlbum")
+                        .param("albumRecopilatorioName", albumName)
+                        .param("canciones", "301")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/app2"));
+
+        // Assert - Verificar que no se intenta acceder a propiedades de artista null
+        verify(artistaRepository).save(any(Artista.class)); // Nuevo artista para el álbum
+        verify(albumRepository).save(any(es.taw.primerparcial.entity.Album.class)); // Nuevo álbum
+        verify(cancionRepository).save(any(Cancion.class)); // Nueva canción
+
+        // Importante: NO se debe haber llamado a artistaRepository.save más de una vez
+        verify(artistaRepository, org.mockito.Mockito.times(1)).save(any(Artista.class));
+    }
 } 

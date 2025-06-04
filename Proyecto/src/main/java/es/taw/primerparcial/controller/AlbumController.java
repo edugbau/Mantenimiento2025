@@ -83,7 +83,6 @@ public class AlbumController {
                     if (cancion.getArtistaList() != null) {
                         for (Artista artista1 : cancion.getArtistaList()) {
                             List<Cancion> cancionArtistaList = artista1.getCancionList();
-                            if (cancionArtistaList == null) cancionArtistaList = new ArrayList<>();
                             cancionArtistaList.add(newCancion);
                             artista1.setCancionList(cancionArtistaList);
                             artistaRepository.save(artista1);
@@ -93,7 +92,6 @@ public class AlbumController {
                     if (cancion.getAlbumId() != null && cancion.getAlbumId().getArtistaId() != null) {
                         Artista original = cancion.getAlbumId().getArtistaId();
                         List<Cancion> cancionArtistaList = original.getCancionList();
-                        if (cancionArtistaList == null) cancionArtistaList = new ArrayList<>();
                         cancionArtistaList.add(newCancion);
                         original.setCancionList(cancionArtistaList);
                         artistaRepository.save(original);

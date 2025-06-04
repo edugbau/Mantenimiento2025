@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
@@ -333,5 +332,62 @@ public class AllControllerTest {
         PlayList savedPlaylist = playlistCaptor.getValue();
         assertNotNull(savedPlaylist.getPlayListCancionList());
         assertFalse(savedPlaylist.getPlayListCancionList().isEmpty());
+    }
+    @Test
+    @WithMockUser
+    public void testAddSongs_withInitializedCancionPlaylistList() throws Exception {
+        // Arrange
+        when(playlistRepository.findById(testPlaylist.getPlayListId())).thenReturn(Optional.of(testPlaylist));
+
+        // Canción con PlayListCancionList ya inicializada con contenido previo
+        Cancion cancionWithInitializedList = new Cancion();
+        cancionWithInitializedList.setCancionId(6);
+        cancionWithInitializedList.setCancionName("Canción con lista inicializada");
+
+        // Crear una lista preexistente con un elemento "marcador"
+        PlayListCancion existingRelation = new PlayListCancion();
+        PlayList otherPlaylist = new PlayList();
+        otherPlaylist.setPlayListId(99);
+        otherPlaylist.setPlayListName("Otra Playlist");
+        existingRelation.setPlayListId(otherPlaylist);
+        existingRelation.setCancionId(cancionWithInitializedList);
+
+        List<PlayListCancion> initialList = new ArrayList<>();
+        initialList.add(existingRelation);
+        cancionWithInitializedList.setPlayListCancionList(initialList);
+
+        when(cancionRepository.findById(cancionWithInitializedList.getCancionId()))
+                .thenReturn(Optional.of(cancionWithInitializedList));
+
+        // Act
+        mockMvc.perform(post("/app1/addSongs")
+                        .param("playlistId", String.valueOf(testPlaylist.getPlayListId()))
+                        .param("cancionesIds", String.valueOf(cancionWithInitializedList.getCancionId()))
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/app1/viewPlaylist?playlistId=" + testPlaylist.getPlayListId()));
+
+        // Assert
+        ArgumentCaptor<List<Cancion>> cancionListCaptor = ArgumentCaptor.forClass(List.class);
+        verify(cancionRepository).saveAll(cancionListCaptor.capture());
+
+        List<Cancion> savedCanciones = cancionListCaptor.getValue();
+        assertFalse(savedCanciones.isEmpty());
+        Cancion savedCancion = savedCanciones.get(0);
+        assertNotNull(savedCancion.getPlayListCancionList());
+
+        // La lista debe contener ahora 2 elementos: el existente y el nuevo
+        assertEquals(2, savedCancion.getPlayListCancionList().size(),
+                "La lista debe contener el elemento original más el nuevo");
+
+        // Verificar que el primer elemento se mantiene (no se ha reinicializado la lista)
+        assertEquals(otherPlaylist.getPlayListId(),
+                savedCancion.getPlayListCancionList().get(0).getPlayListId().getPlayListId(),
+                "El elemento original debe mantenerse en la lista");
+
+        // Verificar que el segundo elemento es la nueva relación con nuestra playlist
+        assertEquals(testPlaylist.getPlayListId(),
+                savedCancion.getPlayListCancionList().get(1).getPlayListId().getPlayListId(),
+                "El nuevo elemento debe ser añadido a la lista existente");
     }
 } 
