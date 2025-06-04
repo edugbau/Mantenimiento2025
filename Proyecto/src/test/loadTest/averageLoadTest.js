@@ -16,7 +16,7 @@ export let options = {
 };
 
 export default function () {
-    check(http.get('http://localhost:8080/medico/1'), {
+    check(http.get('http://localhost:8080/app1/viewPlaylist?playlistId=1'), {
         'Response code was 200': (r) => r.status === 200,
     });
     sleep(1); // Espera 1 segundo entre iteraciones de VU

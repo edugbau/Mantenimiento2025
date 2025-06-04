@@ -13,7 +13,7 @@ export let options = {
 };
 
 export default function () {
-    const BASE_URL = 'http://localhost:8080/medico/1';
+    const BASE_URL = 'http://localhost:8080/app1/viewPlaylist?playlistId=1';
     let res = http.get(BASE_URL);
     check(res, {
         'status was 200': (r) => r.status === 200,
@@ -21,4 +21,4 @@ export default function () {
     sleep(1);
 }
 
-//Interrumpido con 9157 VUs
+//Interrumpido con 8600 VUs
